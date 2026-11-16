@@ -1,1 +1,1780 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>데일리 증시 브리핑</title></head><body style="font-family:sans-serif;padding:24px">첫 리포트를 준비 중입니다.</body></html>
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>데일리 증시 브리핑</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;600;700&display=swap">
+<style>
+/* 레이아웃: 위에서 아래로 시황 → 단기 이슈 → 섹터별(표 + 심층 카드), 상단 목차는 고정 */
+:root {
+  --bg: #f6f7f9; --card: #ffffff; --ink: #1b1f24; --sub: #5b6470; --line: #e3e6ea; --soft: #f0f2f5;
+  --up: #d23c3c; --down: #2f6fd1; --accent: #3b5bdb;
+  --pos-bg: #fdeceb; --neg-bg: #e9f0fc; --neu-bg: #eef0f3;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121418; --card: #1b1e24; --ink: #e8eaed; --sub: #9aa3ad; --line: #2c3038; --soft: #23272e;
+    --up: #ff6b6b; --down: #6ea8ff; --accent: #8ea2ff;
+    --pos-bg: #3a2222; --neg-bg: #1f2b40; --neu-bg: #2a2e35;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121418; --card: #1b1e24; --ink: #e8eaed; --sub: #9aa3ad; --line: #2c3038; --soft: #23272e;
+  --up: #ff6b6b; --down: #6ea8ff; --accent: #8ea2ff;
+  --pos-bg: #3a2222; --neg-bg: #1f2b40; --neu-bg: #2a2e35;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink);
+  font-family: "IBM Plex Sans KR", "Pretendard", "Malgun Gothic", "Apple SD Gothic Neo", system-ui, sans-serif;
+  font-size: 15px; line-height: 1.6; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px);
+  z-index: 10; background: var(--bg); }
+.wrap { max-width: 1080px; margin: 0 auto; padding-block: 24px 80px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+header h1 { margin: 0; font-size: 26px; letter-spacing: -0.02em; text-wrap: balance; }
+header .meta { color: var(--sub); font-size: 13px; margin-top: 4px; }
+.notice { background: var(--soft); color: var(--sub); font-size: 12.5px; padding: 10px 14px;
+  border-radius: 10px; margin: 14px 0 18px; }
+nav.toc { display: flex; flex-wrap: wrap; gap: 8px; position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+  background: var(--bg); padding: 10px 0; border-bottom: 1px solid var(--line); }
+nav.toc a { text-decoration: none; color: var(--ink); background: var(--card); border: 1px solid var(--line);
+  padding: 5px 12px; border-radius: 999px; font-size: 13.5px; white-space: nowrap; }
+nav.toc a:focus-visible, a:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (max-width: 720px) {
+  nav.toc { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+  .issue { flex-direction: column; gap: 2px !important; }
+  .tile .v { font-size: 16px; }
+  header h1 { font-size: 22px; }
+}
+.two > *, .three > *, .issue > * { min-width: 0; }
+nav.toc a:hover { border-color: var(--accent); color: var(--accent); }
+section { margin-top: 34px; scroll-margin-top: 60px; }
+h2 { font-size: 20px; margin: 0 0 12px; letter-spacing: -0.01em; }
+h3 { font-size: 16px; margin: 0; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px;
+  margin-bottom: 14px; }
+.muted { color: var(--sub); }
+.small { font-size: 13px; }
+.up { color: var(--up); } .down { color: var(--down); } .flat { color: var(--sub); }
+.tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-bottom: 14px; }
+.tile { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; }
+.tile .n { font-size: 12.5px; color: var(--sub); }
+.tile .v { font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.tile .c { font-size: 13px; font-variant-numeric: tabular-nums; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media (max-width: 720px) { .two, .three { grid-template-columns: 1fr !important; } }
+.label { font-size: 12px; font-weight: 700; color: var(--sub); margin-bottom: 4px; }
+ul.plain { margin: 6px 0 0; padding-left: 18px; }
+ul.plain li { margin: 3px 0; }
+.news { list-style: none; margin: 8px 0 0; padding: 0; }
+.news li { display: flex; gap: 8px; padding: 7px 0; border-top: 1px dashed var(--line); }
+.news li:first-child { border-top: 0; }
+.tag { flex: none; font-size: 11.5px; font-weight: 700; padding: 1px 7px; border-radius: 6px; height: fit-content;
+  margin-top: 2px; }
+.tag.pos { background: var(--pos-bg); color: var(--up); }
+.tag.neg { background: var(--neg-bg); color: var(--down); }
+.tag.neu { background: var(--neu-bg); color: var(--sub); }
+.src a { font-size: 12px; color: var(--accent); text-decoration: none; margin-left: 4px; white-space: nowrap; }
+.src a:hover { text-decoration: underline; }
+.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--card); }
+table { border-collapse: collapse; width: 100%; font-size: 13.5px; font-variant-numeric: tabular-nums; }
+th, td { padding: 8px 10px; text-align: right; white-space: nowrap; border-bottom: 1px solid var(--line); }
+th { background: var(--soft); color: var(--sub); font-weight: 600; font-size: 12.5px; position: sticky; top: 0; }
+td:first-child, th:first-child { text-align: left; }
+tr:last-child td { border-bottom: 0; }
+tr.deep td:first-child::after { content: "심층"; font-size: 10.5px; color: var(--accent);
+  border: 1px solid var(--accent); border-radius: 5px; padding: 0 4px; margin-left: 6px; }
+.sym { color: var(--sub); font-size: 12px; margin-left: 4px; }
+.deepcard .head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px; }
+.deepcard .price { font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.oneline { margin: 6px 0 10px; font-weight: 600; }
+.counts { font-size: 12.5px; color: var(--sub); }
+.three { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 12px; }
+.box { background: var(--soft); border-radius: 10px; padding: 10px 12px; }
+.box ul { margin: 4px 0 0; padding-left: 16px; font-size: 14px; }
+.box.p .label { color: var(--up); } .box.n .label { color: var(--down); } .box.w .label { color: var(--accent); }
+.overall { margin-top: 12px; padding: 10px 12px; border-left: 3px solid var(--accent); background: var(--soft);
+  border-radius: 0 10px 10px 0; }
+.fin { margin-top: 12px; }
+.fin table { font-size: 12.5px; }
+details { margin-top: 10px; }
+details summary { cursor: pointer; color: var(--sub); font-size: 13.5px; }
+.hl { list-style: none; padding: 0; margin: 6px 0 0; font-size: 13.5px; }
+.hl li { margin: 4px 0; }
+.hl b { display: inline-block; min-width: 110px; }
+.hl a { color: var(--ink); text-decoration: none; }
+.hl a:hover { color: var(--accent); text-decoration: underline; }
+.err { color: var(--up); font-size: 13px; }
+.issue { display: flex; gap: 10px; align-items: baseline; padding: 8px 0; border-top: 1px dashed var(--line); }
+.issue:first-child { border-top: 0; }
+.issue .who { flex: none; min-width: 150px; font-weight: 700; }
+.issue .who .muted { font-weight: 400; font-size: 12px; display: block; }
+footer { margin-top: 40px; color: var(--sub); font-size: 12.5px; }
+</style>
+</head>
+<body><div class="wrap">
+
+<header>
+  <h1>데일리 증시 브리핑</h1>
+  <div class="meta">2026년 11월 12일 10:59 생성 · 국내/미국 · 시범 버전(섹터 2개)</div>
+</header>
+<div class="notice">
+  이 리포트는 공개된 시세·실적·뉴스를 AI가 정리한 참고 자료입니다. 투자 권유가 아니며, AI 요약은 틀릴 수 있으니
+  중요한 내용은 각 문장 옆 <b>출처 링크</b>로 원문을 확인하세요. 시세·재무 숫자는 야후 파이낸스, 뉴스는 구글 뉴스·야후 뉴스 기준입니다.
+  상승은 <span class="up">빨간색</span>, 하락은 <span class="down">파란색</span>입니다.
+</div>
+
+<nav class="toc">
+  <a href="#macro">오늘의 시황</a>
+  <a href="#issues">단기 이슈</a>
+<a href="#kr_it">국내 · IT (정보기술)</a><a href="#kr_hc">국내 · 헬스케어</a><a href="#us_it">미국 · IT (정보기술)</a><a href="#us_hc">미국 · 헬스케어</a></nav>
+
+
+<!-- 1. 시황 -->
+<section id="macro">
+  <h2>오늘의 시황</h2>
+  <div class="tiles">
+    <div class="tile">
+      <div class="n">코스피</div>
+      <div class="v">5,399</div>
+      <div class="c up">+3.06% <span class="muted">· 1개월 -10.5%</span></div>
+    </div>
+    <div class="tile">
+      <div class="n">코스닥</div>
+      <div class="v">703.09</div>
+      <div class="c up">+5.31% <span class="muted">· 1개월 -16.0%</span></div>
+    </div>
+    <div class="tile">
+      <div class="n">S&amp;P 500</div>
+      <div class="v">7,619</div>
+      <div class="c up">+1.31% <span class="muted">· 1개월 -2.4%</span></div>
+    </div>
+    <div class="tile">
+      <div class="n">나스닥</div>
+      <div class="v">25,466</div>
+      <div class="c up">+1.60% <span class="muted">· 1개월 -6.4%</span></div>
+    </div>
+    <div class="tile">
+      <div class="n">다우존스</div>
+      <div class="v">52,486</div>
+      <div class="c up">+0.49% <span class="muted">· 1개월 +1.6%</span></div>
+    </div>
+    <div class="tile">
+      <div class="n">필라델피아 반도체</div>
+      <div class="v">10,564</div>
+      <div class="c up">+5.66% <span class="muted">· 1개월 -13.5%</span></div>
+    </div>
+    <div class="tile">
+      <div class="n">VIX (공포지수)</div>
+      <div class="v">17.49</div>
+      <div class="c down">-10.12% <span class="muted">· 1개월 +14.5%</span></div>
+    </div>
+    <div class="tile">
+      <div class="n">원/달러 환율</div>
+      <div class="v">1,334</div>
+      <div class="c down">-0.56% <span class="muted">· 1개월 -0.4%</span></div>
+    </div>
+    <div class="tile">
+      <div class="n">미국 10년물 금리</div>
+      <div class="v">5.00</div>
+      <div class="c up">+0.30% <span class="muted">· 1개월 -4.2%</span></div>
+    </div>
+    <div class="tile">
+      <div class="n">WTI 유가</div>
+      <div class="v">85.50</div>
+      <div class="c down">-0.63% <span class="muted">· 1개월 -9.2%</span></div>
+    </div>
+    <div class="tile">
+      <div class="n">금</div>
+      <div class="v">3,987</div>
+      <div class="c down">-1.07% <span class="muted">· 1개월 -4.6%</span></div>
+    </div>
+  </div>
+  <div class="two">
+    <div class="card"><div class="label">국내 증시</div>지표상 코스피는 5344.01로 하루 2.0% 올랐고, 코스닥은 694.84로 4.08% 올랐습니다. 다만 1주(코스피 -5.98%, 코스닥 -2.81%)와 1개월(코스피 -11.45%, 코스닥 -16.99%) 기준으로는 아직 크게 빠진 상태라, 최근 상승은 큰 하락 뒤의 반등 성격이 강합니다. 오늘 장 초반은 이틀 연속 급등한 뒤 5380선 근처 보합권에서 움직였다는 보도가 많습니다. 기관은 팔았고 개인·외국인은 사들이면서 장중 5400선을 되찾았다고 알려졌습니다.</div>
+    <div class="card"><div class="label">미국 증시</div>미국 증시는 S&amp;P 500 +1.31%, 나스닥 +1.6%, 다우 +0.49%로 모두 올랐고, 필라델피아 반도체 지수는 5.66% 급등했습니다. 코어위브의 좋은 실적이 &#39;AI 투자로 돈을 벌 수 있느냐&#39;는 걱정을 줄였다는 평가입니다. 하지만 장 마감 뒤 엔비디아 이사회가 젠슨 황 CEO의 거취를 검토한다는 보도가 나왔고, 엔비디아 주가는 시간외 거래에서 약 8% 떨어진 것으로 알려졌습니다. 이에 지수 선물도 내리고 있습니다. 1개월 기준으로는 나스닥 -6.39%, 반도체 지수 -13.47%로 아직 조정 구간입니다.</div>
+  </div>
+  <div class="card">
+    <div class="label">오늘의 핵심 포인트</div>
+    <ul class="plain"><li>반도체·AI 심리: 코어위브 실적 덕분에 반도체 지수가 하루 5.66% 올랐습니다. 반면 엔비디아 CEO 해임 검토 보도는 새 불확실성입니다. 사실인지, 회사가 공식 입장을 내는지 확인이 필요합니다.</li><li>금리: 미국 10년물 금리는 5.0%로 높은 수준이고, 1주 동안 2.13% 올랐습니다(금리 값 자체의 변화율). 미국 물가가 예상보다 높게 나와 연준이 금리를 크게 올릴 수 있다는 관측도 나옵니다. 성장주에는 부담 요인입니다.</li><li>환율: 원/달러 환율은 1334.68원으로 하루 0.54% 내렸습니다(원화 강세). 그러나 달러는 다른 주요 통화 대비 19개월 만의 최고 수준이라는 보도가 있어, 환율이 다시 1340원대로 오를 수 있는지 지켜볼 필요가 있습니다.</li><li>유가·금: WTI 유가는 85.71달러로 1개월 동안 8.95% 내려 물가 부담을 일부 덜어줍니다. 금은 3997.2달러로 1개월 4.31% 내렸습니다.</li><li>변동성: 공포지수(VIX)는 17.49로 하루 10.12% 내렸습니다. 그래도 1개월 기준으로는 14.54% 올라 있어, 시장의 불안이 완전히 가라앉았다고 보기는 어렵습니다.</li></ul>
+  </div>
+  <div class="card">
+    <div class="label">시장 주요 뉴스</div>
+    <ul class="news">
+      <li><span class="tag pos">호재</span><span>코어위브가 좋은 실적을 내면서 AI 투자의 수익성 걱정이 줄었고, 미국 기술주 중심으로 지수가 모두 올랐습니다. 이 영향으로 SK하이닉스 ADR(미국에서 거래되는 주식)도 9.71% 급등했다고 보도됐습니다. <span class="src"><a href="https://news.google.com/rss/articles/CBMiZ0FVX3lxTFB0bFYxdFBxQ2ZneFpPQXBUejE1NEMteldlNWF0NUlOXzRjckxpQWxqUlV0MjBXQ3dKcHUwcGxOX0Q1UDRQa01tODc3d3cwVnpWUnAxTmFqQW5lYmRfdzFUVkotWWtSVGs?oc=5" target="_blank" rel="noopener" title="[미국증시] 엔비디아 시간외 8% 급락…젠슨 황 해임?">[자본시장뉴스]</a><a href="https://news.google.com/rss/articles/CBMiYkFVX3lxTFByM1YwSTNOdk5QeXdsWXZSZ1NkMmk0ZThnOEE4M1Y4Y3pIYkhUaTNXUUhjT2VHaHpXS0RhVTBBazFNLUVIdUliSTNjbG9STUY3dW43WHQwZVB3cWdDVmhseFB3?oc=5" target="_blank" rel="noopener" title="[시황] 미국증시, AI 기업 호실적·IPO 수요 호조에 기술주 주도 상승 마감">[버핏연구소]</a><a href="https://news.google.com/rss/articles/CBMidkFVX3lxTFB3bkR6cGxtczRrUlNLNGNkZG94SThTX3R5WEJMZGY1bDU1NVNrR2IzSmR6WENNRXNlYzFfZGdNVEt1c252WTBja0c1WFc3bVphZ1BrSXNCVzB3dXVGU2ZGTFBUcFJmQ0xQcnBqcjNmdkk0TFhKdWc?oc=5" target="_blank" rel="noopener" title="[1112개장체크] 美 증시, 코어위브 호실적 속 AI 투자 수익성 우려 완화">[인포스탁데일리]</a><a href="https://news.google.com/rss/articles/CBMiWkFVX3lxTFA5OFhRcXF4NUN0aWh0WTJxTU5hNEpsSnF1dnRGZ0JtNU1oVEhKWlB1WjFkZDc5MDhuV3lTd0k4RmhXSktuc1FsUHIyWFhYWE55SEp1dXhFQXZ3d9IBWEFVX3lxTE4zXzhyZV92bkQxU1k2Um1BY1Zlb1YxRVBnLTlKM1NOaTQtOUdzUll2VGFwQnNmRWZDSW9EOGZiY2NXT3ZwMUYtQXdRU3R6REFVYnd1QmpMUXM?oc=5" target="_blank" rel="noopener" title="[뉴욕증시 마감] 코어위브 호실적에 일제히 상승…나스닥 1.60%↑">[아주경제]</a><a href="https://news.google.com/rss/articles/CBMiYEFVX3lxTE90cXVlZ2xMRXdTQUJXWGJJQ3NvMEFlTHlrX2R3MGJpN2xFQkJOS2R1VEp4Q1ZCcUphR2lKZ1U2Q0U2dGpia3lpT2lNQ1FEVkU4OGF3NUdodGxiMTlBVFRqU9IBeEFVX3lxTE5ZSVBzRzVlNTJIamxOdmRmZDRzUE5oX0NEWlRpRWt2RXBrZzNfZnZZVjNFMWp5bFROd1ZyWDJsZjd1czB1TXk1dEJGZGlqaHlOZ1hza09Zb1lLbEJPZ09yQnpaWTJtampUYW8xX3JyQlZoTU51ODJzUQ?oc=5" target="_blank" rel="noopener" title="엔화, 미일 금리차 확대 전망에 1달러=159엔대 후반 하락 출발">[뉴시스]</a></span></span></li>
+      <li><span class="tag neg">악재</span><span>엔비디아 이사회가 젠슨 황 CEO의 거취를 검토하고 있다는 보도가 나왔습니다. 엔비디아 주가는 시간외 거래에서 약 8% 떨어졌고, 미국 지수 선물도 내린 것으로 알려졌습니다. 아직 보도 단계이며, 국내 반도체주 투자심리에도 경계감을 주고 있다는 평가입니다. <span class="src"><a href="https://news.google.com/rss/articles/CBMilwFBVV95cUxPZTJZdHR0WlpKZDI5LUFQa0tpX1BkSzNWZzk0T3BnY0xEbnI4S2dDTzcyMUd0dHJYWHc1ZmNRaEdjaHhWR2xUcWswMXVqLXNHOWZPVURFSmtnelg3cGRfc21aRk1YbFQ4N3ZUTG5keVUwajczOHFHWklmaTdQWkREb1dMQVJJOFkyZC1XdmNWemJLYUhYYmJ3?oc=5" target="_blank" rel="noopener" title="Wall St futures fall as Nvidia slides on report of possible CEO ouster">[Yahoo Finance]</a><a href="https://news.google.com/rss/articles/CBMiugFBVV95cUxNcUpoYWFMS1RDQXdNTV9hZ1pqaEhfbURMRzJmTjFnTmh4NjVzbnlOWG1YbVEtZGV4Sld1TElyTXFxR0pjekk5MFUzLUNfc3JPNkY5TnlsVFFFQlN6RUw4dnNRTGw2YVN3MDIzdHRDLXNvaHFCVko5UDVWTE0teDV1SHRHOWhDU1Rlc3VITHB1S0dfWDVKQlJwaUc2TGhsSUJPTnNfdFhwOWlrMWdmNXpSMlVwUldULXRINEE?oc=5" target="_blank" rel="noopener" title="Futures Fall As Nvidia May Oust CEO Huang; Spoils Big AI-Led Rally?">[Investor&#39;s Business Daily]</a><a href="https://news.google.com/rss/articles/CBMizgFBVV95cUxOTEdzSDBUcDRkbjFSR2RCYVNiR2c1NUUwRnNibUxEOGhNOVdPVkltT2VzcVhzeVFuZFAzZndUWE5RYzdQdXg5N1VCdXdDRDJBMWhJRlAtWXg3NTNteFB5YnpLa2ZuWDJ5ODRFR2h1SWI1UUlkVDZvVE4tSE9SYzVxVEZuZ2ZiaUV3b2VxQmpfVXptRWpKWktOV0hFMDBjc2lEMjVJbzMyQk8zT1AyR3lsVDVLTUhhcE1hRE1JMlZKYkNTZVZaeDJ4TXYyU3REdw?oc=5" target="_blank" rel="noopener" title="Stock Market Today: Nvidia Stock Slides 8% After Hours as Board Weighs Jensen Huang’s Future">[Eurasia Business News]</a><a href="https://news.google.com/rss/articles/CBMibEFVX3lxTFA2a3F2azhkU2pZWjVZQ29IbDdRNVhraERPeTFGNWVmTWR1Uk1OOGtwczlzZXpOVlYxZFNSbUF4ZW5ZQTBTRW9WbUIwOWMyS3I2RTZtNFhNWDV6YWhFX1cwVjhRc1hWdzFBNUNMYtIBcEFVX3lxTE45RGhIYjlrQWtsb1NhYVRfZFEtNW41cmY1eEs3SXJFLVkzQTlhaXk1LUFUaGlqeTFjUU1CN19MSDAtVENzUXlUX1FkajFtX0gwYnpVUm9sNHJUZkN2dW9LXzc5SUR2MHVlaUtiRDhfaFc?oc=5" target="_blank" rel="noopener" title="美 반도체 5.7% 급등 뒤 엔비디아 쇼크…韓 증시 혼조">[엠에스투데이]</a><a href="https://news.google.com/rss/articles/CBMicEFVX3lxTFBvUm5DajhDQmNqcVBpcC1LaXBqdlluc0dqZXR3U3FaSzhHUHVDQUdtaEx3YlVLT1V0VFVzWl9JQ1A5SU4xTVNqVXNjN3ZpN0FDSnBOb0xsWVRzRXItTl8ta3dWRmFVbTY1bDlTQVdvbTTSAXRBVV95cUxOay14Nm5TWTFiV0tXMGhJMHV6bWxxR0RRaUE1QnBqUzgzaWd1OWV2MXdVUlRORE9qTUNIWEYxMDF1RjR5SkE0UjlHYzdZRzZjQW9kbnN3NEZWbmJic2hNclp3VE5wOE13cWh5dzZlYUF2Z1FsdA?oc=5" target="_blank" rel="noopener" title="코스피, 이틀 연속 급등 후 보합권 등락…기관 매도에 상승 제한">[산경투데이]</a></span></span></li>
+      <li><span class="tag neg">악재</span><span>미국 물가 지표가 시장 예상보다 높게 나와 금리 인상 압박이 커졌고, 달러는 19개월 만의 최고 수준까지 올랐다는 보도입니다. 연준이 금리를 한 번에 크게 올리는 &#39;빅스텝&#39;을 할 수 있다는 관측도 나옵니다. <span class="src"><a href="https://news.google.com/rss/articles/CBMicEFVX3lxTE0xMmU5MEtBNnNuNnNQTW5GUjJQYmZpbnp0ME9sZHV2SmFzQ015RVVBX2JjOFZpYkxmeG9HLVM5RTZDN1JielkydnUzbHM1bmtvdDhpdDR6bXoyQVRWd0xqZ2hCZzF0cHBob2FFUXFxYnbSAXRBVV95cUxPRGNBWXktVm1XU2d4NVJLdGtwWE80bWF0N1dfYjhINWRMR0dyZnVNWXI0N2xxZ1VESzg2VDdnVWpmVmRDQTFzN3FUa0lNeE5XWU1PUmd5LVlCekhHRUNkcmJuSWZMX3ZaeGdzTnB4aTZfMDZxNw?oc=5" target="_blank" rel="noopener" title="美 물가 충격에 달러 강세…금리 인상 압박에 19개월 만에 최고">[산경투데이]</a><a href="https://news.google.com/rss/articles/CBMiXEFVX3lxTE9HZzRpY0JlNVBpdWRSQVRfaHRJQktuTTlncWQzbTYyd2Zmb1hleUlVdlRZWmtpVzFhQVdDcU5QMXpuM3FxbjAwREVvRWRkT1hiQW9LUlk0YzVNRnpz?oc=5" target="_blank" rel="noopener" title="엔화, 160엔 돌파 목전...연준 &#39;빅스텝&#39; 관측에 달러 매수 가속">[뉴스핌]</a><a href="https://news.google.com/rss/articles/CBMigAFBVV95cUxNclZrMGdBZGNvVVprOXdHWmtteDVpb01oLTJqTzA4U2NPamRnS1IyOG1KZkJ4OFJfR3l1bmU5LVRoc1pjejkxc1M5UXVZblA5QTlLYms4ZnJ2MDczc0JoODVSMlhXWC1vQ1VLU0RlLVFLZUNMM2hoSllUNkJQdWlQUQ?oc=5" target="_blank" rel="noopener" title="연준 긴축 경계 속 AI주가 반등…환율 1340원대 재진입 시도[외환브리핑]">[이데일리]</a><a href="https://news.google.com/rss/articles/CBMiX0FVX3lxTE9sX2c0MDd4eXQyVFJHUjgyazFNODRpdWZoZS1DaXBicGFuV0JDR01WOFlGbUI5MzZ4WWF2eVdRaDd4MFctQ0x4RVJ4ZFQwcEJpQVI4XzZ0dEc0aDdHNDhz?oc=5" target="_blank" rel="noopener" title="원·달러 환율, 1337.5원…달러, 美 연준 추가 긴축 우려에 강세">[조세일보]</a></span></span></li>
+      <li><span class="tag neu">중립</span><span>코스피는 이틀 연속 급등한 뒤 장 초반 5360~5380선에서 숨을 고르는 모습이었습니다. 기관이 팔아 상승폭은 제한됐지만, 개인·외국인이 사들이면서 장중 5400선을 되찾았다는 보도입니다. 삼성전자는 강세였던 것으로 알려졌습니다. <span class="src"><a href="https://news.google.com/rss/articles/CBMic0FVX3lxTE1reG5KQVlya05TOEdzYXhUMFpzSV9fRTlxUm5MWjkwNmVrQm5qSDQxcUs3ZGhIcVJta044MGRYNURZU09leE44aXpnVWNIYnJKWFRsWVAxRllWT19fMDRRcHQtdHpnZkVjRkM2OWdkU1NNTGs?oc=5" target="_blank" rel="noopener" title="코스피 개인·외국인 순매수에 장중 5400선 강보합세, 코스닥은 700선 약보합">[비즈니스포스트]</a><a href="https://news.google.com/rss/articles/CBMi9wFBVV95cUxNVWxkampGc2VMZTJxNnFROGJxSkwyekp6UEYwUXRZWk5rcXVJcU9oalhkb1ZBaVYxRGVQa2dUM3ZOc0F2RUNjUGs4Wll1dVJYSXpaY0FIQWUzeXlfcXloMENScEV4cDEwTktCaWFVeWc3eTZtMzAyaUhHdEJiMVAzY2prdmQyMmIwRl8tdWlQQldqeDNON1UzdTZJaHJqRmxSejBIMXd4RmRweExEbTQ4X290eDVMNnlLbGVnS1RxYzF6SFo2WW02ZmJoTGtPTW1IVDc2YWxDMEp6TDhKNjVmdll0c20xUDNLVDlWUm1yYm5FN2ltejhn?oc=5" target="_blank" rel="noopener" title="개미·외인 &#39;사자&#39;…코스피 장중 5400선 회복 [시황]">[데일리안]</a><a href="https://news.google.com/rss/articles/CBMiYEFVX3lxTFBvYktRaDNjM1BMbkFCeU9MRWhfMW1DcnRNMDJwTS0yOTVrZ0xoS3JRYjVnU21TWWtnTWc2QVpUTm9WUHBuZWJXNk14T0Jhc2xtQXo3SEdfeEtEYmc0U3ZzZA?oc=5" target="_blank" rel="noopener" title="코어위브 날고 엔비디아 흔들…코스피, 경계감 팽팽">[아시아경제]</a><a href="https://news.google.com/rss/articles/CBMicEFVX3lxTFA5MUZsYmVUaGlLVVdrSGZtSG1IVFFHb1hxMExoRWRPWS1oUFJXVkE0R3VmMXpUSTdkOElGbHo3WXRDYmVZaE9KaHo2cmNjaE1hWXNRYVFYdmNSLXJTN19JQmg0SHA5Zzg3TGVtTlY2dnLSAXRBVV95cUxOelAtTV9rZDV5Z20tR2NPQUZrSWlzZWVRTllfSFlOeFdNYU80UUtYcUpLNFJDa0FyU0RackhEd0hzamR0TGZ4UnhPLXBwX041R0pBUGlDUW9sZ0tHOVU1YW1XUnpveHUydExlUTV0bldDOXNMVg?oc=5" target="_blank" rel="noopener" title="[개장] 코스피 0.7% 상승… 이틀 급등에 장 초반 눈치보기">[IT조선]</a><a href="https://news.google.com/rss/articles/CBMib0FVX3lxTE5Ga0c4ZTZSRml5UkNTN285OTRsX08xTGx6UlJ6TG1BN1hBaXRhT003blFyVFp4Qm5mcEVHMmZHVjZSRl9sV01hYzVZT2UxNkVHQWZ2d1VOMnBBaXFGTmxQMFg0cnpLN1V2Ykh4T2s4bw?oc=5" target="_blank" rel="noopener" title="美 반도체 훈풍에도 코스피 주춤…젠슨 황 해임설에 증시 출렁">[진일보 | 전남일보]</a><a href="https://news.google.com/rss/articles/CBMiakFVX3lxTFBwU1ZBTnIwLWZkSWNlUjZvWlkycmstaWppeklrUmFRWDlfcFpYb19Vb0VyUXJhck9UTkZvOWduWURDZkc2eTJCckgyOEhzY0EwMEJ3Q0V5cktkY2J3QzF5QUdyMUVhRUl6bHc?oc=5" target="_blank" rel="noopener" title="기관 매도에 코스피 5380선 등락…삼성전자 강세·코스닥 약세">[한국면세뉴스]</a></span></span></li>
+      <li><span class="tag neu">중립</span><span>원/달러 환율은 미국 긴축 우려에도 원화가 강세를 보이며 1330원대 초반에서 오르내린다는 보도입니다. 반면 엔화는 미국과 일본의 금리 차이가 더 벌어질 것이라는 전망에 1달러=159엔대 후반까지 약해졌고, 160엔에 가까워졌다고 알려졌습니다. <span class="src"><a href="https://news.google.com/rss/articles/CBMiW0FVX3lxTE53bUhFZmRMVGxfMVVNRW5XMS1TbmtZSkkydzJYb183ZktwS0J2TWloenlKLWlrak5QS0VVVzFFeThhODJ5RlVZVVl2OUVQZ053dEtWUk4zZkV6ZHc?oc=5" target="_blank" rel="noopener" title="&#39;금리 인상 우려&#39; 달러·원 환율 상승 출발…1336.6원 개장">[뉴스1]</a><a href="https://news.google.com/rss/articles/CBMiXkFVX3lxTE9EOExDc25sQ29mdGFnamxtNG1vY0h2ME5tTi04NFVRb2Z0ZUswZlczY3A3cjdFR1Rxd2VOSEx3RGtnRFF4TWpiWkJ4X3VZYzlET0dKX3ZLVmlvMnFheFE?oc=5" target="_blank" rel="noopener" title="환율, 1330원대 초반 등락…美 긴축 우려에도 원화 강세에 상승 제한">[뉴스투데이]</a><a href="https://news.google.com/rss/articles/CBMiXEFVX3lxTE9HZzRpY0JlNVBpdWRSQVRfaHRJQktuTTlncWQzbTYyd2Zmb1hleUlVdlRZWmtpVzFhQVdDcU5QMXpuM3FxbjAwREVvRWRkT1hiQW9LUlk0YzVNRnpz?oc=5" target="_blank" rel="noopener" title="엔화, 160엔 돌파 목전...연준 &#39;빅스텝&#39; 관측에 달러 매수 가속">[뉴스핌]</a></span></span></li>
+      <li><span class="tag neg">악재</span><span>스트래티지가 MSCI 지수에서 빠지면서 시간외 거래에서 1.7% 떨어졌다는 보도입니다. 지수를 따라 투자하는 자금에서 약 28억 달러 규모의 매도가 나올 수 있다는 우려가 나옵니다. <span class="src"><a href="https://news.google.com/rss/articles/CBMiWEFVX3lxTE1tVWRYSjJmMHRfMjcwRkhRWTdPQ1B4ek9yVDdGTHY5aDBvUGxTeXJRcmJoQjFOdk5xWVlrQkFEYWpuVV9LME1raGFwbGZzZTJSMmJCZFZZSDk?oc=5" target="_blank" rel="noopener" title="MSCI 지수서 퇴출된 스트래티지, 시간외 1.7% 하락…28억달러 매도 우려(종합)">[블록미디어]</a></span></span></li>
+    </ul>
+  </div>
+</section>
+
+<!-- 2. 단기 이슈 -->
+<section id="issues">
+  <h2>오늘의 단기 이슈</h2>
+  <div class="card">
+    <div class="issue">
+      <div class="who">주성엔지니어링 <span class="down">-1.9%</span>
+        <span class="muted">KR · IT (정보기술)</span></div>
+      <div>주성엔지니어링은 11일 기관 순매수에 힘입어 17.14% 급등 마감했습니다. 오늘은 장중 -4.2%로 되밀리는 중입니다. 오늘 거래량은 20일 평균의 0.69배로 섹터에서 가장 많지만 평균보다는 적습니다. 하락 원인을 직접 설명하는 뉴스는 없고, 급등 뒤 차익 매물로 보는 시각만 일부 보도됐습니다. <span class="src"><a href="https://news.google.com/rss/articles/CBMibEFVX3lxTE5LZmtrVGMySk9hellvcXNUcldQX1hqclJTd0hlMENGTDdnRnZZaVVPb2s0WjBhVkx5ZENhTmJpZmZxRDBvdFhMY3dVZ25wVlRPcFRtLXZSYmlBMlFiQUZHZ3pzTVZKNXY1c1d6TQ?oc=5" target="_blank" rel="noopener" title="LG이노텍, ‘넥슬라이드 C+’로 CES 혁신상… 시리즈 3년 연속 수상">[이코노미톡뉴스]</a><a href="https://news.google.com/rss/articles/CBMiZ0FVX3lxTFBDUkNLNHZJbVhJckxPdXVxOGlRTXhqeXlRZ2Vya0VEeTZ1MTZDYnJvNzk3QnlaZklmdm5jVkFwT1l2WUVMa0JCd0E3RDVaUjJvbUJacmJtcTlFeGF4QkNIODJJTlR1bjA?oc=5" target="_blank" rel="noopener" title="LG이노텍, 동반성장지수 10년 연속 최우수…&#34;실질적 상생경영 강화&#34;">[팍스경제TV]</a><a href="https://news.google.com/rss/articles/CBMid0FVX3lxTE9YVjlHc1VlZmR0MlZiUnA3QXl3dG5TNW1IenpsLXUwZ1dkSUpCOEJXeVl6SllwcDB2QnZydFF0RFdWM2hIblU5UHlzaVNMRjFtVnFCZXlVSjNXTHFQLWRQS0hMZjJVRkktdnJZa0N1TFNOVkNnTE1Z0gF3QVVfeXFMT1hWOUdzVWVmZHQyVmJScDdBeXd0blM1bUh6emwtdTBnV2RJSkI4Qld5WXpKWXBwMHZCdnJ0UXREV1YzaEhuVTlQeXNpU0xGMW1WcUJleVVKM1dMcVAtZFBLSExmMlVGSS12cllrQ3VMU05WQ2dMTVk?oc=5" target="_blank" rel="noopener" title="[코스닥 외국인] 주성엔지니어링 에코프로 사고 심텍 이오테크닉스 팔아">[핀포인트뉴스]</a><a href="https://news.google.com/rss/articles/CBMicEFVX3lxTE9SSExucEpvWUlMX2NJQnZYVWlfQnFTSlYteWN1NWx3cTYyMTN1dlBYZndOUUQwRU1YNG9BOU5BT2RETTh1bmZ4RjRSNW5MN3luQzgyaDg3bFM2WXd3bmRianJ1YWw2dzBQOTVOX1c0aGLSAXBBVV95cUxPUkhMbnBKb1lJTF9jSUJ2WFVpX0JxU0pWLXljdTVsd3E2MjEzdXZQWGZ3TlFEMEVNWDRvQTlOQU9kRE04dW5meEY0UjVuTDd5bkM4Mmg4N2xTNll3d25kYmpydWFsNncwUDk1Tl9XNGhi?oc=5" target="_blank" rel="noopener" title="[특징주]주성엔지니어링, 코스닥 반등 속 기관 순매수에 17.14% 약진 마감">[남도일보]</a><a href="https://news.google.com/rss/articles/CBMigAFBVV95cUxPaHJ6MkpJbHNMU3J6MXU5ZlFOQ0xyaHVZcFdSZnRJcWlPY3oxWElUWXZGU1IwU3lMaXZSYUpDWVRyUlBieWVoMV9IQVlyNFR4dklMcmhLdW9LdGhPdHBqN3QzckQ1QXRfNF85em9mR2ZIZ3k1VGdyZzlmLUlKZW80Sg?oc=5" target="_blank" rel="noopener" title="LG이노텍, 기판 호황에 카메라 고도화 수혜…주가 저점 근접-SK">[이데일리]</a></span></div>
+    </div>
+    <div class="issue">
+      <div class="who">한미반도체 <span class="down">-1.0%</span>
+        <span class="muted">KR · IT (정보기술)</span></div>
+      <div>한미반도체는 11일 외국인·기관 동시 순매수로 장중 +5.31%를 기록했습니다. 오늘은 -3.26%로 섹터에서 하락 폭이 큰 편입니다. 오늘 하락을 직접 설명하는 뉴스는 뚜렷하지 않습니다. 다만 엔비디아 대중 규제로 관련 기업들이 긴장하고 있다는 보도가 있었습니다. <span class="src"><a href="https://news.google.com/rss/articles/CBMic0FVX3lxTE5GRFQ1N1VfLVRnOXAxNVN3Ym9JdkEwelVuU1YwbzJweC1NVnZUMTVpRDVVY3FtTG9icGJ3UkNuR3pKSVR2M21ab0cxc1ZaU3pSZnRGRkJJVWxnMVM2WGFaYnRoVFFQMWQ4eHJhdG9kNVlJNVHSAXNBVV95cUxORkRUNTdVXy1UZzlwMTVTd2JvSXZBMHpVblNWMG8ycHgtTVZ2VDE1aUQ1VWNxbUxvYnBid1JDbkd6SklUdjNtWm9HMXNWWlN6UmZ0RkZCSVVsZzFTNlhhWmJ0aFRRUDFkOHhyYXRvZDVZSTVR?oc=5" target="_blank" rel="noopener" title="코스닥 &#39;질주&#39;...주성엔지니어링·심텍·제주반도체 &#39;점프&#39;">[초이스경제]</a><a href="https://news.google.com/rss/articles/CBMiXEFVX3lxTE0zV0ZJWS1QUnJzVG5fV09iUWhlZzZLWTJGdTE0dTdCRGJTRWlTQ1V5cTk5SVhRUkZYTWFsSW1VVTNiZ3psTG5sbk1jY1dyb25KTS1wRkNpSk1mc1Rj?oc=5" target="_blank" rel="noopener" title="한미반도체 주가 하락 중">[아시아뉴스통신]</a><a href="https://news.google.com/rss/articles/CBMiUkFVX3lxTE5RMWZjcTg0Q29aN0ZiS0JWMFRYX0VtdGJBZFZFYW43eXRhSm0wSURSTXZNRUVnTmllWlpuUTBaRGxBaFhLVmJrYWVRYkVrcEoyUWc?oc=5" target="_blank" rel="noopener" title="삼성 ·SK하이닉스·한미반도체, 즉각 파장 없다지만..엔비디아 대중 규제에 초긴장">[한국정경신문]</a></span></div>
+    </div>
+    <div class="issue">
+      <div class="who">SK하이닉스 <span class="up">+0.7%</span>
+        <span class="muted">KR · IT (정보기술)</span></div>
+      <div>&#39;젠슨 황(엔비디아 CEO) 해임 논의가 이르면 오늘 있을 수 있다&#39;는 보도가 나와 삼성전자·SK하이닉스가 주목하고 있다고 전해졌습니다. 제목만 있는 정보라 사실 여부와 실제 영향은 아직 확인되지 않았습니다. <span class="src"><a href="https://news.google.com/rss/articles/CBMiakFVX3lxTFBEaTVfNmd0NnlzQ0xqWktYcXNoaG5JdEtfbll4NFJqWUZMNW9BTks3LVFIYU1YcHVCUDJ5aXRuRV9tVi1qNmlTdW9KVFRvXzBCWDVYb19tajhaT2hGaElXSkRDRkxVdmJxaWc?oc=5" target="_blank" rel="noopener" title="SK하이닉스와 충북 청주시가 함께 담근 사랑의 김장김치, 어려운 이웃에게 전달">[청주일보]</a></span></div>
+    </div>
+    <div class="issue">
+      <div class="who">한미약품 <span class="down">-9.2%</span>
+        <span class="muted">KR · 헬스케어</span></div>
+      <div>한미약품은 장중 -8.45%로 섹터에서 가장 많이 내렸습니다. 거래량도 20일 평균의 0.65배로 다른 종목보다 많았습니다. 해외 비만약 반입이 허용돼 가격 경쟁력이 약해질 수 있다는 우려가 하락 이유로 보도됐습니다. <span class="src"><a href="https://news.google.com/rss/articles/CBMiWkFVX3lxTE0wVHVsa3NKa1otcml2VDlYZGVNeTRsSm9LbnhJS193bWpKS1VKN2FFYnlJTnRNWVBCZTROdUlocGowTXlLbDV4c0I0WnFYWl9sY1NFMDljbXhxdw?oc=5" target="_blank" rel="noopener" title="&#34;가격 경쟁력 사라지나&#34; 한미약품, 해외 비만약 반입 허용에 7.27% 급락">[한국경제]</a></span></div>
+    </div>
+    <div class="issue">
+      <div class="who">알테오젠 <span class="down">-3.2%</span>
+        <span class="muted">KR · 헬스케어</span></div>
+      <div>알테오젠은 오늘 -3.81%로, 1주 -16.55%, 3개월 -49.28% 하락이 이어지고 있습니다. 미국 약가 규정이 바뀌면서 피하주사(SC) 제형 키트루다의 로열티가 줄 수 있다는 우려로 하루에 16% 급락했다는 보도가 있었습니다. <span class="src"><a href="https://news.google.com/rss/articles/CBMia0FVX3lxTE9iT1dWak5Fc21PaEx0YkpVVFRSczdBZUVhelRZWVVlXzRkLUtjemw3SFpZZzljczVyVWtnZ0JDaW9sX2wwcGRjR2VhVHpUWjEzc1RET2pXUTM5a2hBbXNReXgxS3JnaUtOYWtZ?oc=5" target="_blank" rel="noopener" title="[숏폼] 알테오젠, 美 약가 규정에 주가 16% 급락">[히트뉴스]</a><a href="https://news.google.com/rss/articles/CBMiV0FVX3lxTE54cXhCSU9mNENGZVM2Q3JUOHA2LXRRUnhTODhfa3plV2tMVnRVQTJMZkdSR1RRUmdJOGdnbG0zSTZweGhWdl9XZldUbzUyNUZjUnBzdV9VYw?oc=5" target="_blank" rel="noopener" title="알테오젠 주가 끌어내린 미국 약가 정책 변경 효과 일시적일까 : 전태연 &#39;피하주사 제형 키트루다&#39; 로열티 감소 대비 불가피">[허프포스트코리아]</a><a href="https://news.google.com/rss/articles/CBMic0FVX3lxTE1zZElWY3ozSEFDLXVqQ2NjWFdKaUFjUjdkckl6dXU4TnFkMFpnYk84a01lajgzcFFNMVl0aTAtbmtrSzlKZ19vVjhuZElaZmY1UHY2ZTdZWmtHci11TzNCSGZDU21SYzlpRWtGS1piUzNIcjQ?oc=5" target="_blank" rel="noopener" title="K피하주사 전환 기술, 美 약가인하에 발목 잡힐까…전망은">[마켓인]</a></span></div>
+    </div>
+    <div class="issue">
+      <div class="who">삼성바이오로직스 <span class="down">-0.6%</span>
+        <span class="muted">KR · 헬스케어</span></div>
+      <div>삼성바이오로직스의 약 2.7조 원(2조6650억 원) 유상증자에서 기존 주주와 우리사주 청약률이 96.8%로 알려졌습니다. 이 증자는 폴리펩타이드그룹 인수와 연결돼 있다는 보도입니다. <span class="src"><a href="https://news.google.com/rss/articles/CBMiWkFVX3lxTE1XcTNISks2VU4yLV9MSzJQRDJlT1ViVmhJaUVfSUQzN2l6blJRdzhQU2VRVlFramxwMElDZEU5MjlYTWpEdEVNWGZ1ZHpiN05XSkhTbDFsSnAwQQ?oc=5" target="_blank" rel="noopener" title="삼성바이오로직스, 2조6650억 원 유상증자 청약률 96.8% 기록">[위클리피플 인물지식가이드저널]</a><a href="https://news.google.com/rss/articles/CBMiYEFVX3lxTFBRMXBTQjdSMUJaYmFVNlYySDJTTXlnMm9udnhHRThJVG5IVE9IZWNTZXhNUGN5c1o5VzFrZTlMend4azB2aGllMENPdXFVZ25tajdLQVV5c25lOGNNdHdGVA?oc=5" target="_blank" rel="noopener" title="삼성바이오로직스, 2.7조 유상증자 청약률 96.8%">[뉴스1]</a><a href="https://news.google.com/rss/articles/CBMiZEFVX3lxTE5ZOFVMZlNSemFieG1KMGlIa2NuN2ZyT0prMUJqT0duOTE1V0hwSloxQ2M0cllrLU9BRWNheG5yMFJuY2NaOFZDblFUdWdQSWJqcTNSa2c2ZklPZV9pS2hYdXVQbWo?oc=5" target="_blank" rel="noopener" title="삼성바이오로직스, 유상증자 주주·우리사주 청약률 96.83%">[메디포뉴스]</a><a href="https://news.google.com/rss/articles/CBMibEFVX3lxTE9fcGwzN2puTUgzQzhjX0pIZUswT3F5RWxiRC1jb0N0VHR3QUo0akh0eGdaUG4zOEU2bklYOF9PMl9uT2NkVkE3NHpSSVpnMW9YLXh4bnp4aDFSbGY0NDZPbUZCUU9rOFpSUm1XSg?oc=5" target="_blank" rel="noopener" title="삼성바이오로직스, 2.7조 유증 청약률 96.8%…폴리펩타이드그룹 인수 속도">[메디컬투데이]</a></span></div>
+    </div>
+    <div class="issue">
+      <div class="who">엔비디아 <span class="up">+2.9%</span>
+        <span class="muted">US · IT (정보기술)</span></div>
+      <div>엔비디아 이사회가 젠슨 황 CEO 교체 여부를 논의하려고 모였다는 보도(로이터, 소식통 인용)가 나왔습니다. 이후 시간외 거래에서 주가가 약 8% 떨어졌고, 투자 자금이 AMD·브로드컴 쪽으로 옮겨갔다는 보도도 있습니다. 정규장 거래량은 20일 평균의 1.82배였습니다. <span class="src"><a href="https://www.barrons.com/articles/nvidia-stock-price-huang-affair-ceo-ouster-26c99dad?siteid=yhoof2&amp;yptr=yahoo" target="_blank" rel="noopener" title="Nvidia Stock Tumbles. Jensen Huang Could Be Out Soon.">[Barrons.com]</a><a href="https://finance.yahoo.com/technology/article/nvidia-reportedly-preparing-to-oust-ceo-huang-after-alleged-affairs-with-spy-nvidia-exec-231315876.html" target="_blank" rel="noopener" title="Nvidia reportedly preparing to oust CEO Huang after alleged affairs with spy, Nvidia exec">[Yahoo Finance]</a><a href="https://finance.yahoo.com/news/nvidia-preparing-oust-ceo-jensen-223546395.html" target="_blank" rel="noopener" title="Nvidia board meets to decide CEO Huang&#39;s future, source says">[Reuters]</a><a href="https://finance.yahoo.com/markets/stocks/articles/nvidia-stock-sinks-jensen-huang-002504447.html" target="_blank" rel="noopener" title="Nvidia Stock Sinks as Jensen Huang Ouster Report Sends Investors Toward AMD, Broadcom">[Benzinga]</a><a href="https://247wallst.com/investing/2026/11/11/more-bad-news-for-nvidia-with-board-planning-to-boot-jensen-huang-sam-altman-reveals-master-plan-to-stop-buying-their-chips/" target="_blank" rel="noopener" title="More Bad News for NVIDIA. With Board Planning to Boot Jensen Huang, Sam Altman Reveals Master Plan to Stop Buying Their Chips">[24/7 Wall St.]</a></span></div>
+    </div>
+    <div class="issue">
+      <div class="who">마이크론 <span class="up">+11.9%</span>
+        <span class="muted">US · IT (정보기술)</span></div>
+      <div>마이크론은 하루에 11.89% 올랐습니다. 최근 크게 떨어진 반도체주를 싸게 사려는 매수가 몰렸고, 코어위브 실적 덕분에 AI 관련주가 함께 반등한 영향으로 보입니다. 같은 날 앤트로픽 상장 관련 사모 투자에 10억 달러를 넣기로 했다는 보도도 나왔습니다. <span class="src"><a href="https://www.investors.com/news/technology/chip-stocks-rally-amd-txn-arm-mtsi-mu/?src=A00220&amp;yptr=yahoo" target="_blank" rel="noopener" title="Chip Stocks Rally After Slide. These Names Are Leading The Charge Higher.">[Investor&#39;s Business Daily]</a><a href="https://www.fool.com/coverage/stock-market-today/2026/11/11/stock-market-today-nov-11-stock-market-today-nov-11-nasdaq-surges-as-coreweave-s-25-rally-reignites-the-ai-trade/" target="_blank" rel="noopener" title="Stock Market Today, Nov. 11: Stock Market Today, Nov. 11: Nasdaq Surges as CoreWeave&#39;s 25% Rally Reignites the AI Trade">[Motley Fool]</a><a href="https://finance.yahoo.com/technology/ai/articles/micron-technology-mu-commits-1-221041537.html" target="_blank" rel="noopener" title="Micron Technology (MU) Commits $1 Billion To Landmark AI Infrastructure IPO">[Simply Wall St.]</a></span></div>
+    </div>
+    <div class="issue">
+      <div class="who">오라클 <span class="up">+8.8%</span>
+        <span class="muted">US · IT (정보기술)</span></div>
+      <div>오라클은 하루에 8.82% 올랐습니다. 코어위브의 실적과 자금 조달 조정으로 &#39;AI 투자에 쓰이는 빚&#39; 걱정이 줄었다는 분석이 나왔습니다. 다만 거래량은 20일 평균의 0.87배로 많지 않았습니다. <span class="src"><a href="https://www.fool.com/investing/2026/11/11/why-oracle-stock-is-up-today/" target="_blank" rel="noopener" title="Why Oracle Stock Is Up Today">[Motley Fool]</a><a href="https://finance.yahoo.com/markets/stocks/articles/oracle-stocks-climb-7-2-183823857.html" target="_blank" rel="noopener" title="Oracle Stocks Climb 7.2% as CoreWeave&#39;s Funding Reset Eases AI Debt Fears">[GuruFocus.com]</a><a href="https://www.fool.com/coverage/stock-market-today/2026/11/11/stock-market-today-nov-11-stock-market-today-nov-11-nasdaq-surges-as-coreweave-s-25-rally-reignites-the-ai-trade/" target="_blank" rel="noopener" title="Stock Market Today, Nov. 11: Stock Market Today, Nov. 11: Nasdaq Surges as CoreWeave&#39;s 25% Rally Reignites the AI Trade">[Motley Fool]</a></span></div>
+    </div>
+    <div class="issue">
+      <div class="who">애보트 <span class="down">-1.1%</span>
+        <span class="muted">US · 헬스케어</span></div>
+      <div>애보트는 하루 -1.06%, 1주 -5.38%로 섹터에서 가장 약했습니다. 거래량도 20일 평균의 0.93배로 다른 종목보다 많은 편이었습니다. 하락 원인을 설명하는 뚜렷한 뉴스 없음. <span class="src"></span></div>
+    </div>
+    <div class="issue">
+      <div class="who">암젠 <span class="up">+0.6%</span>
+        <span class="muted">US · 헬스케어</span></div>
+      <div>암젠의 쇼그렌병 치료 후보 dazodalibep이 3상 임상(OASIZ-301, 환자 648명, 48주)에서 1차 목표를 달성했다고 발표됐습니다. 당일 주가는 +0.62%였습니다. <span class="src"><a href="https://investorshub.advfn.com/market-news/article/39801/amgen-reports-phase-3-dazodalibep-trial-meets-primary-endpoint-in-sjogrens-disease" target="_blank" rel="noopener" title="Amgen Reports Phase 3 Dazodalibep Trial Meets Primary Endpoint in Sjögren’s Disease">[InvestorsHub]</a><a href="https://www.investors.com/news/technology/amgen-stock-sjogrens-disease-treatment/?src=A00220&amp;yptr=yahoo" target="_blank" rel="noopener" title="Amgen, In A Buy Zone, Unveils Highly Anticipated Novartis-Rivaling Sjogren&#39;s Data">[Investor&#39;s Business Daily]</a></span></div>
+    </div>
+    <div class="issue">
+      <div class="who">화이자 <span class="up">+0.3%</span>
+        <span class="muted">US · 헬스케어</span></div>
+      <div>화이자가 블랙스톤과 15억 달러 규모 계약을 맺어 비만 치료 후보 berobenatide 개발 비용을 충당한다는 보도가 나왔습니다. 주가는 하루 +0.31%, 1주 -4.35%입니다. <span class="src"><a href="https://www.wsj.com/health/pharma/pfizer-signs-1-5-billion-deal-with-blackstone-to-fund-weight-loss-drug-development-b6b08b5d?siteid=yhoof2&amp;yptr=yahoo" target="_blank" rel="noopener" title="Pfizer Signs $1.5 Billion Deal With Blackstone to Fund Weight-Loss-Drug Development">[The Wall Street Journal]</a></span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 3. 섹터별 -->
+<section id="kr_it">
+  <h2>국내 · IT (정보기술)</h2>
+<div class="card"><div class="label">섹터 요약</div>IT 섹터 대형주는 최근 1개월 동안 대부분 10~35% 떨어졌습니다. 11일 코스피·코스닥이 AI 기대감으로 크게 반등한 뒤, 오늘은 삼성전자만 오르고 나머지는 대체로 약보합~하락입니다. 거래량은 모든 종목이 20일 평균의 0.22~0.69배로 적은 편입니다. 뉴스로는 코어위브(미국 AI 클라우드 기업) 재무 리스크 완화, HBM(AI용 고성능 메모리) 투자 같은 긍정 소식과, 엔비디아 대중 규제 관련 우려가 함께 나왔습니다.</div>
+  <div class="table-wrap">
+  <table>
+    <thead><tr>
+      <th>종목 (시가총액순)</th><th>현재가</th><th>1일</th><th>1주</th><th>1개월</th><th>3개월</th>
+      <th>거래량<br>(20일 평균 대비)</th><th>52주 고점 대비</th><th>시가총액</th><th>예상 PER</th>
+      <th>목표가 괴리</th><th>애널리스트</th>
+    </tr></thead>
+    <tbody>
+    <tr class="deep">
+      <td>삼성전자<span class="sym">005930.KS</span></td>
+      <td>211,750원</td>
+      <td class="up">+2.8%</td>
+      <td class="up">+5.1%</td>
+      <td class="down">-8.7%</td>
+      <td class="down">-7.9%</td>
+      <td>0.3배</td>
+      <td class="down">-41.6%</td>
+      <td>1,378.9조</td>
+      <td>2.7</td>
+      <td class="up">+124.6%</td>
+      <td>강력매수 <span class="muted">(35명)</span></td>
+    </tr>
+    <tr class="">
+      <td>SK하이닉스<span class="sym">000660.KS</span></td>
+      <td>1,286,000원</td>
+      <td class="up">+0.7%</td>
+      <td class="up">+1.7%</td>
+      <td class="down">-9.4%</td>
+      <td class="down">-9.4%</td>
+      <td>0.3배</td>
+      <td class="down">-55.9%</td>
+      <td>906.9조</td>
+      <td>2.4</td>
+      <td class="up">+141.1%</td>
+      <td>강력매수 <span class="muted">(39명)</span></td>
+    </tr>
+    <tr class="">
+      <td>삼성전기<span class="sym">009150.KS</span></td>
+      <td>936,000원</td>
+      <td class="up">+1.4%</td>
+      <td class="down">-0.8%</td>
+      <td class="down">-31.9%</td>
+      <td class="down">-26.5%</td>
+      <td>0.3배</td>
+      <td class="down">-58.8%</td>
+      <td>70.7조</td>
+      <td>19.0</td>
+      <td class="up">+159.3%</td>
+      <td>강력매수 <span class="muted">(27명)</span></td>
+    </tr>
+    <tr class="">
+      <td>삼성SDI<span class="sym">006400.KS</span></td>
+      <td>479,500원</td>
+      <td class="up">+0.2%</td>
+      <td class="down">-5.8%</td>
+      <td class="down">-18.9%</td>
+      <td class="down">-0.4%</td>
+      <td>0.3배</td>
+      <td class="down">-32.7%</td>
+      <td>37.7조</td>
+      <td>27.0</td>
+      <td class="up">+56.5%</td>
+      <td>매수 <span class="muted">(33명)</span></td>
+    </tr>
+    <tr class="">
+      <td>삼성에스디에스<span class="sym">018260.KS</span></td>
+      <td>227,000원</td>
+      <td class="down">-1.5%</td>
+      <td class="up">+10.7%</td>
+      <td class="up">+12.1%</td>
+      <td class="up">+2.0%</td>
+      <td>0.3배</td>
+      <td class="down">-37.3%</td>
+      <td>17.6조</td>
+      <td>19.9</td>
+      <td class="up">+19.8%</td>
+      <td>매수 <span class="muted">(20명)</span></td>
+    </tr>
+    <tr class="">
+      <td>한미반도체<span class="sym">042700.KS</span></td>
+      <td>182,100원</td>
+      <td class="down">-1.0%</td>
+      <td class="up">+7.7%</td>
+      <td class="down">-16.3%</td>
+      <td class="down">-11.4%</td>
+      <td>0.4배</td>
+      <td class="down">-55.5%</td>
+      <td>17.3조</td>
+      <td>40.1</td>
+      <td class="up">+24.7%</td>
+      <td>중립 <span class="muted">(7명)</span></td>
+    </tr>
+    <tr class="deep">
+      <td>주성엔지니어링<span class="sym">036930.KQ</span></td>
+      <td>174,950원</td>
+      <td class="down">-1.9%</td>
+      <td class="up">+19.3%</td>
+      <td class="down">-27.3%</td>
+      <td class="up">+20.8%</td>
+      <td>0.8배</td>
+      <td class="down">-37.2%</td>
+      <td>8.0조</td>
+      <td>-</td>
+      <td class="down">-76.0%</td>
+      <td>-</td>
+    </tr>
+    <tr class="">
+      <td>LG이노텍<span class="sym">011070.KS</span></td>
+      <td>293,500원</td>
+      <td class="up">+0.2%</td>
+      <td class="up">+3.0%</td>
+      <td class="down">-33.5%</td>
+      <td class="down">-47.1%</td>
+      <td>0.2배</td>
+      <td class="down">-80.8%</td>
+      <td>6.9조</td>
+      <td>7.8</td>
+      <td class="up">+151.5%</td>
+      <td>매수 <span class="muted">(26명)</span></td>
+    </tr>
+    <tr class="">
+      <td>이오테크닉스<span class="sym">039030.KQ</span></td>
+      <td>371,000원</td>
+      <td class="down">-0.5%</td>
+      <td class="up">+20.7%</td>
+      <td class="down">-20.8%</td>
+      <td class="up">+3.9%</td>
+      <td>0.4배</td>
+      <td class="down">-39.4%</td>
+      <td>4.6조</td>
+      <td>27.4</td>
+      <td class="up">+54.0%</td>
+      <td>강력매수 <span class="muted">(4명)</span></td>
+    </tr>
+    <tr class="deep">
+      <td>리노공업<span class="sym">058470.KQ</span></td>
+      <td>53,200원</td>
+      <td class="up">+2.3%</td>
+      <td class="up">+5.8%</td>
+      <td class="down">-30.0%</td>
+      <td class="down">-24.8%</td>
+      <td>0.4배</td>
+      <td class="down">-58.1%</td>
+      <td>4.0조</td>
+      <td>19.1</td>
+      <td class="up">+72.1%</td>
+      <td>매수 <span class="muted">(13명)</span></td>
+    </tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="muted small" style="margin-top:6px">
+    기준일 2026-11-12
+<b>장중 가격</b>(리포트를 만든 시점, 거래량도 장중 누적)    · 예상 PER = 주가 ÷ 향후 12개월 예상 주당순이익 · 목표가 괴리 = 애널리스트 평균 목표가와 현재가 차이
+<br>※ 국내 종목의 예상 PER·목표가·애널리스트 의견은 야후 집계라 갱신이 늦거나 부정확할 수 있습니다. 주가가 급변한 뒤에는 목표가 괴리가 과장되어 보일 수 있으니 참고만 하세요.  </div>
+
+  <div class="card deepcard" style="margin-top:14px">
+    <div class="head">
+      <h3>삼성전자 <span class="sym">005930.KS</span></h3>
+      <span class="price">211,750원</span>
+      <span class="up">+2.79%</span>
+      <span class="counts">뉴스 호재 3 · 악재 1 · 중립 1</span>
+    </div>
+    <div class="oneline">실적은 가파르게 늘고 있지만 주가는 52주 고점보다 42.48% 낮습니다. 오늘은 HBM 투자 소식 속에 +1.21%이고, 거래량은 적습니다.</div>
+    <ul class="news">
+      <li><span class="tag pos">호재</span><span>이재용 회장이 &#39;온양캠퍼스를 최첨단 HBM 거점으로 바꾸겠다&#39;고 밝혔다고 여러 매체가 보도했습니다. <span class="src"><a href="https://news.google.com/rss/articles/CBMiY0FVX3lxTE14TEFhWEhHWm4yRUcyQnJzWVI4dnpxc2R3TElVR2JyZnhVaGlGVWs0VXlBaGNSWndfTzg2WTdudnRfWndibUFBWXUwdDFGdGx4THpYVGhvT090TXNpc0wxNS01NA?oc=5" target="_blank" rel="noopener" title="젠슨 황 퇴진보다 무서운 ‘美 규제 후폭풍’…삼성·SK 中 사업 부담 커지나">[에너지경제신문]</a><a href="https://news.google.com/rss/articles/CBMidEFVX3lxTE9NOGhsMzEwTVhWMEEyYVRDcTBaOWtXT2drS1pDbFJrNk9Ybm1aV2FZYWNGd1lXM3BoNUpiTVo4Z21IWkZqVDQyM3d2LWRka0V0dHVVSG5QUlZDbUJKSEtyOW56VUdHZklyVWp1alJhNWNCeDlL?oc=5" target="_blank" rel="noopener" title="[3Q실적] 전력반도체 호황 탄 DB하이텍…삼성전자 8인치 철수 &#39;반사이익&#39;">[파이낸셜포스트]</a><a href="https://news.google.com/rss/articles/CBMia0FVX3lxTE9PNVE4OVJrckRDZExpMmlHZE5VNzJoaWRfNmNFQXc3RU9lYU9mVXpwX3RtbmxvYWl4R2dDV3RpMU9QcWcxZnJWQUpUYU42SEQ2QlVNbzVDYzdHaGlVM2UxWjFwZ2ZXYlpEcmdJ0gFvQVVfeXFMTVFia2VxdlFuMmhTWVVoM2pEOHZqRWJfMkE2TzNjaDk0Mmp3dlg4QTFFeTNhRER5enA2M3FyemJLcGxJY3F3Z2NIMUgzeGZTMzBSaWRreDlIbTRNQUlRSE95Mk9GM1d2RXBFamJrNW40?oc=5" target="_blank" rel="noopener" title="삼성전자, 15년 연속 동반성장 평가 ‘최우수’…국내 기업 최초">[더퍼블릭]</a></span></span></li>
+      <li><span class="tag pos">호재</span><span>모건스탠리가 삼성전자 목표가 30만 원을 제시하고 내년 이익 전망을 올렸다는 보도가 있습니다. <span class="src"><a href="https://news.google.com/rss/articles/CBMic0FVX3lxTFByS2NMbHBrUDNNWGdzR0xiTG0zNDNHZzFTSGxUcHU2RC1tWWdzZy03RmJPVG9lcURjMGNKWmtFUGVoeFhuX2p5ckJrekQxMnFKejBTYXRZaFM5ek1KbDhoUFFpbElRUGp2eFNwdjBsZjJzaFU?oc=5" target="_blank" rel="noopener" title="코어위브 재무 리스크 완화에 AI 반도체주 반등, 삼성전자 SK하이닉스에 &#39;훈풍&#39; 예고">[비즈니스포스트]</a></span></span></li>
+      <li><span class="tag pos">호재</span><span>코어위브의 재무 리스크가 줄면서 AI 반도체주가 반등했고, 삼성전자·SK하이닉스에도 긍정적일 수 있다는 보도가 있습니다. <span class="src"><a href="https://news.google.com/rss/articles/CBMiYEFVX3lxTFBnVTgybmd4Q3lfUXlBSWNoYUdaTGgteEVCYzJjaTdpalZoM0ZPSThPVmRvOVI3dVV1eFJaNUNNTWdILWJuZjM4QUtBUVA2SmpQN1NPUTI3SFpDRWsyei1Ub9IBeEFVX3lxTE5hX0tUNE8zOW1kV2hEVnJFVURLWmRGc01oY2tRRTJuSVZCMnRYa2g5dmx3Y2xqRW9fLUJxb3M0LWwtM3hKdWYwbDNrTFNnc3dwU3lpZ2lqZ1BBTFJSRU5iYW5jeFR1OFU2Uy1KTUdheGZjODQ2eXJUYQ?oc=5" target="_blank" rel="noopener" title="이 대통령 &#34;충청·호남·영남 투자계획 차질없이 추진…끝까지 챙길 것&#34;">[뉴시스]</a></span></span></li>
+      <li><span class="tag neu">중립</span><span>이 대통령이 충청권 메가프로젝트 착공식에서 이재용 회장에게 &#39;과감한 투자에 감사하다&#39;고 말했다고 전해졌습니다. <span class="src"><a href="https://news.google.com/rss/articles/CBMiaEFVX3lxTE9KZzNOYUxSVk5SeUhKcF9fVGlNLUZMNy11S19ucGxKdkFXSGxmejhXZy13aC1UM2djMVVTNzVGWFdVbXN5djRib2ZDZWxVcjBVeDJ1WjN3LXNzRGpZODRkUUQtM19aUUJV0gFsQVVfeXFMT3hyWTVtRDJteHdRYS1XR1Q4Umg5RHNaRDVqRDJTaFZxYVFxU2xlSlhSdmRVZVBUOGQtY0o4eks1MTlabWU0REE4LU1ZSUNXTDFUX0tNVkdSQUZrTjZYZnRMbjA5SHZNQTZ5ZFJj?oc=5" target="_blank" rel="noopener" title="LG 이어 삼성전자까지 제소…대만 특허 인수한 美 NPE 공세">[블로터]</a><a href="https://news.google.com/rss/articles/CBMiYEFVX3lxTE9QdG9UU3pYR0xXYmwtVFNaX2t3TWVaVUxoM2NXMllUSWhXUDk1Z0tCSGh6NFFxZ0pMQ2ktRTEtSUdDWHRleXMtV0F6aEVJdXIxNVBtemtXblQ1aUZQTXllVA?oc=5" target="_blank" rel="noopener" title="삼성전자 전영현 부회장 &#34;충청권 메가프로젝트 본격화…반도체 패키징 메카 육성&#34;">[뉴시스]</a></span></span></li>
+      <li><span class="tag neg">악재</span><span>엔비디아 젠슨 황 CEO의 해임 논의 가능성을 다룬 보도가 나와 삼성·SK하이닉스가 주목하고 있다고 합니다. 사실 여부는 확인이 필요합니다. <span class="src"><a href="https://news.google.com/rss/articles/CBMiakFVX3lxTFBEaTVfNmd0NnlzQ0xqWktYcXNoaG5JdEtfbll4NFJqWUZMNW9BTks3LVFIYU1YcHVCUDJ5aXRuRV9tVi1qNmlTdW9KVFRvXzBCWDVYb19tajhaT2hGaElXSkRDRkxVdmJxaWc?oc=5" target="_blank" rel="noopener" title="SK하이닉스와 충북 청주시가 함께 담근 사랑의 김장김치, 어려운 이웃에게 전달">[청주일보]</a></span></span></li>
+    </ul>
+    <div class="three">
+      <div class="box p"><div class="label">긍정 요인</div><ul><li>분기 영업이익이 4분기 연속 늘었습니다: 2025년 9월 분기 약 12.2조 → 2025년 12월 분기 약 20.1조 → 2026년 3월 분기 약 57.2조 → 2026년 6월 분기 약 89.5조 원. 같은 기간 매출도 약 86.1조에서 약 171.5조 원으로 늘었습니다.</li><li>HBM 생산 거점 확대 등 AI 메모리 투자 계획이 나오고 있습니다.</li><li>애널리스트 35명의 평균 의견은 강력매수이고, 평균 목표가는 현재가보다 128.12% 높습니다.</li></ul></div>
+      <div class="box n"><div class="label">부정 요인</div><ul><li>1개월 -10.13%, 3개월 -9.35%로 주가가 약하고, 52주 고점보다 42.48% 낮습니다.</li><li>오늘 거래량이 20일 평균의 0.28배에 그쳐, 반등에 힘이 실렸다고 보기 어렵습니다.</li><li>엔비디아 관련 불확실한 보도 등 외부 AI 업황 변수에 민감합니다.</li></ul></div>
+      <div class="box w"><div class="label">체크 포인트</div><ul><li>2027-01-27 실적 발표에서 매출 추정치(약 224.6조 원)를 달성하는지 확인할 필요가 있습니다.</li><li>선행 PER은 2.7배로 매우 낮은데 주가는 많이 빠졌습니다. 시장이 이익이 계속될지 의심하고 있는지 확인할 필요가 있습니다.</li><li>온양 HBM 거점 전환의 구체적인 일정과 투자 규모가 나오는지 봐야 합니다.</li></ul></div>
+    </div>
+    <div class="overall"><div class="label">종합 (중장기 관점)</div>최근 네 분기 동안 매출과 이익이 크게 늘었고, HBM 투자로 AI 메모리 경쟁력을 키우려 하고 있습니다. 반면 주가는 고점 대비 크게 떨어진 상태입니다. 앞으로는 메모리 호황이 얼마나 오래 가는지, 그리고 엔비디아 등 AI 고객 쪽 변수가 핵심입니다. 다음 실적 발표에서 이익 증가세가 이어지는지가 중요한 확인 포인트입니다.</div>
+
+    <div class="fin">
+      <div class="label">최근 분기 실적 (야후 파이낸스 기준)</div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>분기</th><th>2025-09</th><th>2025-12</th><th>2026-03</th><th>2026-06</th></tr></thead>
+        <tbody>
+          <tr><td>매출</td><td>86.1조</td><td>93.8조</td><td>133.9조</td><td>171.5조</td></tr>
+          <tr><td>영업이익</td><td>12.2조</td><td>20.1조</td><td>57.2조</td><td>89.5조</td></tr>
+          <tr><td>순이익</td><td>12.0조</td><td>19.3조</td><td>47.1조</td><td>71.3조</td></tr>
+        </tbody>
+      </table></div>
+      <div class="muted small" style="margin-top:6px">
+        다음 실적 발표: 2027-01-27
+ · 다음 분기 매출 예상 224.6조      </div>
+    </div>
+  </div>
+  <div class="card deepcard" style="margin-top:14px">
+    <div class="head">
+      <h3>리노공업 <span class="sym">058470.KQ</span></h3>
+      <span class="price">53,200원</span>
+      <span class="up">+2.31%</span>
+      <span class="counts">뉴스 호재 0 · 악재 0 · 중립 0</span>
+    </div>
+    <div class="err">이 종목의 AI 분석을 만들지 못했습니다.</div>
+
+    <div class="fin">
+      <div class="label">최근 분기 실적 (야후 파이낸스 기준)</div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>분기</th><th>2025-09</th><th>2025-12</th><th>2026-03</th><th>2026-06</th></tr></thead>
+        <tbody>
+          <tr><td>매출</td><td>968억</td><td>848억</td><td>998억</td><td>1,432억</td></tr>
+          <tr><td>영업이익</td><td>483억</td><td>404억</td><td>473억</td><td>735억</td></tr>
+          <tr><td>순이익</td><td>419억</td><td>396억</td><td>404억</td><td>659억</td></tr>
+        </tbody>
+      </table></div>
+      <div class="muted small" style="margin-top:6px">
+        다음 실적 발표: 미정
+ · 다음 분기 매출 예상 1,022억      </div>
+    </div>
+  </div>
+  <div class="card deepcard" style="margin-top:14px">
+    <div class="head">
+      <h3>주성엔지니어링 <span class="sym">036930.KQ</span></h3>
+      <span class="price">174,950원</span>
+      <span class="down">-1.93%</span>
+      <span class="counts">뉴스 호재 2 · 악재 2 · 중립 0</span>
+    </div>
+    <div class="oneline">11일 17% 넘게 급등한 뒤 오늘은 -4.2%로 되밀리고 있습니다. 적자에서 막 벗어난 실적에 비해 기업가치가 높다는 지적도 나옵니다.</div>
+    <ul class="news">
+      <li><span class="tag pos">호재</span><span>11일 코스닥 반등 속에 기관 순매수가 들어오며 17.14% 오른 17만 8,400원에 마감했습니다. <span class="src"><a href="https://news.google.com/rss/articles/CBMibEFVX3lxTE5LZmtrVGMySk9hellvcXNUcldQX1hqclJTd0hlMENGTDdnRnZZaVVPb2s0WjBhVkx5ZENhTmJpZmZxRDBvdFhMY3dVZ25wVlRPcFRtLXZSYmlBMlFiQUZHZ3pzTVZKNXY1c1d6TQ?oc=5" target="_blank" rel="noopener" title="LG이노텍, ‘넥슬라이드 C+’로 CES 혁신상… 시리즈 3년 연속 수상">[이코노미톡뉴스]</a><a href="https://news.google.com/rss/articles/CBMiZ0FVX3lxTFBDUkNLNHZJbVhJckxPdXVxOGlRTXhqeXlRZ2Vya0VEeTZ1MTZDYnJvNzk3QnlaZklmdm5jVkFwT1l2WUVMa0JCd0E3RDVaUjJvbUJacmJtcTlFeGF4QkNIODJJTlR1bjA?oc=5" target="_blank" rel="noopener" title="LG이노텍, 동반성장지수 10년 연속 최우수…&#34;실질적 상생경영 강화&#34;">[팍스경제TV]</a><a href="https://news.google.com/rss/articles/CBMiUkFVX3lxTE1YLXJhQkhUalR4T2tZaWVPM3VWeUJjLVBlWGpnYW94RDRlODdUT3BTZzRZeHZYbW83YTEydS1fdTJsVVl6bURNb1RqNlVNR3lEU1E?oc=5" target="_blank" rel="noopener" title="삼전닉스 반등에 추격매수 나선 초고수...소부장은 차익실현 [주식 초고수는 지금]">[매일경제]</a><a href="https://news.google.com/rss/articles/CBMiY0FVX3lxTE14ODl6WlE4eURiZkczd3FrcWN0ZDZZcjVGaHphMklmTGpUdjA3aEJTUHpCNkc4UDJpcXpLLXFyWXZrTEptUExjb245eWU5T1gtMlFycmFwaXktVjJYdGJmVDdTWQ?oc=5" target="_blank" rel="noopener" title="코스닥, 810선 회복…알테오젠·주성엔지니어링·원익IPS↑">[CBC뉴스]</a><a href="https://news.google.com/rss/articles/CBMibEFVX3lxTE8yM0g1bVhVeGhmS3dQdkRLOEpfNVZiZmJ1Q19qY09fOTZOc0FTUFh2OVNCN2lIMTI0MTFXVl9yeXc4S1R3cU93Zm9CQW5weGs3dGhfU1BGcE5KU3ZpZjJzSFRGM21xdmpqZTNOcQ?oc=5" target="_blank" rel="noopener" title="LG이노텍, 동반성장지수 10년 연속 최우수 … 협력사 지원 3040억원">[워크투데이]</a></span></span></li>
+      <li><span class="tag pos">호재</span><span>11일 코스닥 외국인 순매수 종목에 주성엔지니어링이 포함됐습니다. <span class="src"><a href="https://news.google.com/rss/articles/CBMic0FVX3lxTE45Wmg2V19xdmNCS0NudzBJaS16ODhxaGc4emhQUHczTUhwbENvTG5pNzhpNkN6d2dBcUREb2VHNE0xb18wZ3QtdXlnUTkwRlkzYUlSXzA3MFhXMG5xVWxRQXYwUlRBNWRLN29qdE9ReEVJR03SAXdBVV95cUxPdUxIdS0zdnc2TzRtUloxTFp2bU93V2xwaW1QQ0VRam5CN0doeE5DdmRtUGZXZFlteDVoMXI4cTZkUUhab0djRE1PN3o3alYxaXI0OVAxYnI1bWxBQWhfSkptU3JLY1BpYUpQcGhYTEVnQkthWm5lZw?oc=5" target="_blank" rel="noopener" title="주성엔지니어링, LG이노텍 시총 추월…매출 80분의 1인데 기업가치는 1조원 더 높아">[핀포인트뉴스]</a></span></span></li>
+      <li><span class="tag neg">악재</span><span>주성엔지니어링 시가총액이 LG이노텍을 넘어섰다는 보도가 있습니다. 매출은 LG이노텍의 80분의 1인데 기업가치는 1조 원 더 높다는 내용입니다. <span class="src"><a href="https://news.google.com/rss/articles/CBMiS0FVX3lxTE9oUlhnQml2QTVMbndlZFJPblFyMlVjRF9EZ2R1cHdoNmZiYzZKWURZbjVuLVpMVXBwSVAtUzlidTktZ1M4dUExd3BDTQ?oc=5" target="_blank" rel="noopener" title="[마감분석] 주성엔지니어링 17%대 급등 17만8400원 마감 : 기업주식정보">[재경일보]</a></span></span></li>
+      <li><span class="tag neg">악재</span><span>오늘은 장중 2~3%대 하락했다는 보도가 이어졌습니다. 전날에는 소부장(반도체 소재·부품·장비) 종목에서 차익 실현이 나왔다는 보도도 있었습니다. <span class="src"><a href="https://news.google.com/rss/articles/CBMid0FVX3lxTE9YVjlHc1VlZmR0MlZiUnA3QXl3dG5TNW1IenpsLXUwZ1dkSUpCOEJXeVl6SllwcDB2QnZydFF0RFdWM2hIblU5UHlzaVNMRjFtVnFCZXlVSjNXTHFQLWRQS0hMZjJVRkktdnJZa0N1TFNOVkNnTE1Z0gF3QVVfeXFMT1hWOUdzVWVmZHQyVmJScDdBeXd0blM1bUh6emwtdTBnV2RJSkI4Qld5WXpKWXBwMHZCdnJ0UXREV1YzaEhuVTlQeXNpU0xGMW1WcUJleVVKM1dMcVAtZFBLSExmMlVGSS12cllrQ3VMU05WQ2dMTVk?oc=5" target="_blank" rel="noopener" title="[코스닥 외국인] 주성엔지니어링 에코프로 사고 심텍 이오테크닉스 팔아">[핀포인트뉴스]</a><a href="https://news.google.com/rss/articles/CBMicEFVX3lxTE9SSExucEpvWUlMX2NJQnZYVWlfQnFTSlYteWN1NWx3cTYyMTN1dlBYZndOUUQwRU1YNG9BOU5BT2RETTh1bmZ4RjRSNW5MN3luQzgyaDg3bFM2WXd3bmRianJ1YWw2dzBQOTVOX1c0aGLSAXBBVV95cUxPUkhMbnBKb1lJTF9jSUJ2WFVpX0JxU0pWLXljdTVsd3E2MjEzdXZQWGZ3TlFEMEVNWDRvQTlOQU9kRE04dW5meEY0UjVuTDd5bkM4Mmg4N2xTNll3d25kYmpydWFsNncwUDk1Tl9XNGhi?oc=5" target="_blank" rel="noopener" title="[특징주]주성엔지니어링, 코스닥 반등 속 기관 순매수에 17.14% 약진 마감">[남도일보]</a><a href="https://news.google.com/rss/articles/CBMigAFBVV95cUxPaHJ6MkpJbHNMU3J6MXU5ZlFOQ0xyaHVZcFdSZnRJcWlPY3oxWElUWXZGU1IwU3lMaXZSYUpDWVRyUlBieWVoMV9IQVlyNFR4dklMcmhLdW9LdGhPdHBqN3QzckQ1QXRfNF85em9mR2ZIZ3k1VGdyZzlmLUlKZW80Sg?oc=5" target="_blank" rel="noopener" title="LG이노텍, 기판 호황에 카메라 고도화 수혜…주가 저점 근접-SK">[이데일리]</a></span></span></li>
+    </ul>
+    <div class="three">
+      <div class="box p"><div class="label">긍정 요인</div><ul><li>영업이익이 2025년 12월 분기 약 -125.8억 원, 2026년 3월 분기 약 -70.3억 원 적자에서 2026년 6월 분기 약 14.2억 원 흑자로 돌아섰습니다.</li><li>분기 매출이 약 522.8억 원(2025년 12월 분기)에서 약 598.8억 원(2026년 6월 분기)으로 늘었습니다.</li><li>3개월 +18.02%, 1주 +16.5%로 최근 수급이 몰렸습니다.</li></ul></div>
+      <div class="box n"><div class="label">부정 요인</div><ul><li>흑자 전환했지만 영업이익 규모가 작고, 선행 PER 데이터는 없습니다.</li><li>매출 대비 기업가치가 높다는 지적이 나오고 있습니다.</li><li>애널리스트는 1명뿐이고, 그 목표가는 현재가보다 75.42% 낮습니다. 표본이 1명이라 참고 수준입니다.</li></ul></div>
+      <div class="box w"><div class="label">체크 포인트</div><ul><li>흑자 전환이 다음 분기에도 이어지는지 봐야 합니다.</li><li>급등 뒤 기관·외국인 매수가 계속되는지 확인할 필요가 있습니다.</li><li>애널리스트 분석이 더 나오는지(현재 1명) 지켜볼 필요가 있습니다.</li></ul></div>
+    </div>
+    <div class="overall"><div class="label">종합 (중장기 관점)</div>최근 분기 흑자 전환과 매출 증가는 긍정적입니다. 다만 이익 규모가 아직 작아 지금 기업가치를 실적만으로 설명하기는 어렵다는 지적이 있습니다. 하루 사이 등락이 클 만큼 수급 영향이 큽니다. 중장기적으로는 흑자가 얼마나 꾸준히 이어지는지가 가장 중요한 확인 포인트입니다.</div>
+
+    <div class="fin">
+      <div class="label">최근 분기 실적 (야후 파이낸스 기준)</div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>분기</th><th>2025-09</th><th>2025-12</th><th>2026-03</th><th>2026-06</th></tr></thead>
+        <tbody>
+          <tr><td>매출</td><td>588억</td><td>523억</td><td>549억</td><td>599억</td></tr>
+          <tr><td>영업이익</td><td>34억</td><td>-126억</td><td>-70억</td><td>14억</td></tr>
+          <tr><td>순이익</td><td>76억</td><td>-47억</td><td>-12억</td><td>55억</td></tr>
+        </tbody>
+      </table></div>
+      <div class="muted small" style="margin-top:6px">
+        다음 실적 발표: 미정
+      </div>
+    </div>
+  </div>
+
+  <details>
+    <summary>섹터 종목별 최근 뉴스 제목 보기</summary>
+    <ul class="hl">
+      <li><b>삼성전자</b><a href="https://news.google.com/rss/articles/CBMiQkFVX3lxTFA3RlFRT0MwY0FRMlZUc05ka2FIMDFsSTNUTHF4dVNYWUFrR3BwSEhjRkZDUV9Rd2lSVkR5NDA5eHNYZw?oc=5" target="_blank" rel="noopener">청와대 &#34;이 대통령, 이재용 삼성전자 회장과 충청권 메가프로젝트 착공식 참석&#34;</a>
+        <span class="muted small">브레이크뉴스 11/12 10:53</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMiWkFVX3lxTFBBN2tsVWwzbzFtZTJEdzhjN0JROGVOQlFIY0lnSzNpTUg2Ykp5LTU1dVM5YlktWlJ2WTIxV2RSX243R1JPZUR3QVVaaS1vT0JhYTJ3ZWh4dkxhUQ?oc=5" target="_blank" rel="noopener">코스피, 개인 매수세 속 5400선 공방…삼성전자 2%대↑</a>
+        <span class="muted small">한국경제 11/12 10:53</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMiaEFVX3lxTE9KZzNOYUxSVk5SeUhKcF9fVGlNLUZMNy11S19ucGxKdkFXSGxmejhXZy13aC1UM2djMVVTNzVGWFdVbXN5djRib2ZDZWxVcjBVeDJ1WjN3LXNzRGpZODRkUUQtM19aUUJV0gFsQVVfeXFMT3hyWTVtRDJteHdRYS1XR1Q4Umg5RHNaRDVqRDJTaFZxYVFxU2xlSlhSdmRVZVBUOGQtY0o4eks1MTlabWU0REE4LU1ZSUNXTDFUX0tNVkdSQUZrTjZYZnRMbjA5SHZNQTZ5ZFJj?oc=5" target="_blank" rel="noopener">LG 이어 삼성전자까지 제소…대만 특허 인수한 美 NPE 공세</a>
+        <span class="muted small">블로터 11/12 10:48</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMiY0FVX3lxTE14TEFhWEhHWm4yRUcyQnJzWVI4dnpxc2R3TElVR2JyZnhVaGlGVWs0VXlBaGNSWndfTzg2WTdudnRfWndibUFBWXUwdDFGdGx4THpYVGhvT090TXNpc0wxNS01NA?oc=5" target="_blank" rel="noopener">젠슨 황 퇴진보다 무서운 ‘美 규제 후폭풍’…삼성·SK 中 사업 부담 커지나</a>
+        <span class="muted small">에너지경제신문 11/12 10:46</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMickFVX3lxTFBMRkJhcnRWTFNEYkZtc2d2RzRnY1VkUGt6WWNOMWVURmtIN0h1dkt2VkFObktKVUV3a2xGbXBGVVNqWTVEZ195eWxOaEFtR1J5RF9PYmliaDdVaUNVYVYwLUVGTDNxdkV5a0V2OWJXLThaUQ?oc=5" target="_blank" rel="noopener">이재용, 충청권 메가 착공식서 &#34;또 한번의 도약 약속드린다&#34;</a>
+        <span class="muted small">KB Think 11/12 10:45</span></li>
+      <li><b>SK하이닉스</b><a href="https://news.google.com/rss/articles/CBMiakFVX3lxTFBEaTVfNmd0NnlzQ0xqWktYcXNoaG5JdEtfbll4NFJqWUZMNW9BTks3LVFIYU1YcHVCUDJ5aXRuRV9tVi1qNmlTdW9KVFRvXzBCWDVYb19tajhaT2hGaElXSkRDRkxVdmJxaWc?oc=5" target="_blank" rel="noopener">SK하이닉스와 충북 청주시가 함께 담근 사랑의 김장김치, 어려운 이웃에게 전달</a>
+        <span class="muted small">청주일보 11/12 10:50</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMiY0FVX3lxTE14TEFhWEhHWm4yRUcyQnJzWVI4dnpxc2R3TElVR2JyZnhVaGlGVWs0VXlBaGNSWndfTzg2WTdudnRfWndibUFBWXUwdDFGdGx4THpYVGhvT090TXNpc0wxNS01NA?oc=5" target="_blank" rel="noopener">젠슨 황 퇴진보다 무서운 ‘美 규제 후폭풍’…삼성·SK 中 사업 부담 커지나</a>
+        <span class="muted small">에너지경제신문 11/12 10:46</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMiZkFVX3lxTFB5TE83MXFEbHFjcnZDdDZIRlVzUnhxdk9vZnJkMHMxaF85Ulk4MUpSdlBiR1NxcVpQWUJiSTRBcXNvN1hLV04tNUlkeTM1eEx1MV9vWnEyNlhJTzNGVEJycHFFNXdzdw?oc=5" target="_blank" rel="noopener">젠슨 황 이르면 오늘 해임 논의…삼성·SK하이닉스 ‘촉각’</a>
+        <span class="muted small">마이데일리 11/12 10:34</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMidEFVX3lxTFB1ZHYyVjhVRWJxcmdDM3J3TW9yU0dJc2Y0enNlUVNZeXdWa29GZlVKdzZDamxFVklrbWpHV2hxTjlyQ2Z3MmJBNE9JMV9Edk5pd05yakJYNzBXQ2w2VE5UeUo4cG5tclNrMERUMUI0dFJrbHN1?oc=5" target="_blank" rel="noopener">美서 10% 뛴 SK하이닉스, 국내선 되레 하락하는 이유 [칩칩폭폭]</a>
+        <span class="muted small">조세일보 11/12 10:27</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMic0FVX3lxTFByS2NMbHBrUDNNWGdzR0xiTG0zNDNHZzFTSGxUcHU2RC1tWWdzZy03RmJPVG9lcURjMGNKWmtFUGVoeFhuX2p5ckJrekQxMnFKejBTYXRZaFM5ek1KbDhoUFFpbElRUGp2eFNwdjBsZjJzaFU?oc=5" target="_blank" rel="noopener">코어위브 재무 리스크 완화에 AI 반도체주 반등, 삼성전자 SK하이닉스에 &#39;훈풍&#39; 예고</a>
+        <span class="muted small">비즈니스포스트 11/12 10:24</span></li>
+      <li><b>삼성전기</b><a href="https://news.google.com/rss/articles/CBMiaEFVX3lxTE9qVEo2ZnQ4MmpKOTN2UzcwQ1plaUcwLW1KQlJ3Nm03LVktYXhHZWcwellYejE1U0ZyVmxmUGpGdlZUNGRUVXB2clc1ZWxmMnBLY2l4ZGw3azRaM05PU2t6bzZXY1BXWjV6?oc=5" target="_blank" rel="noopener">삼성전기, 영업이익 2026년 148%·2027년 112% 증가 전망…대신증권 &#39;추가 상향 가능성&#39;</a>
+        <span class="muted small">CBC뉴스 11/12 09:51</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMickFVX3lxTE1YRTZiTVYwV1kwVVlwWXc2c2dRbHVERnFIY3VkSVlDTUZ2dU9pcVJpYVk3N0RWNVhDVGJpYzhwbldSbTRlMjV4ZEIzWWtxOFJVRDJFdmloOHFqYzlsdEFka2JWZXhtWHdmZko4Zm9YY2hRQQ?oc=5" target="_blank" rel="noopener">삼성전기 주가, 11월 12일 장중 944,000원 2.28% 상승</a>
+        <span class="muted small">중앙이코노미뉴스 11/12 09:40</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMiXEFVX3lxTE9ZRGpKb0NpNlY2Nl94SUNIeS1XcW9XSFAxM1lHdGZKUDZIRE9OVnJhLXY2UjhEeWdvVlQ3Y2d5c3ZFWWE3dDFKWDdFS2h2WTk0UE02TG1uMlJUb1ZT?oc=5" target="_blank" rel="noopener">삼성전기 주가 상승 중</a>
+        <span class="muted small">아시아뉴스통신 11/12 09:39</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMiTkFVX3lxTE0teU5wZ3pwNXZLR3RIM0c5Q05YM1pWbXY0RTVONkJidHZYMm1LeXFQU01CdWZmVWZwVGFjY1YyMjFXSEp1ak02dUtDRlY4UQ?oc=5" target="_blank" rel="noopener">삼성전기 유리기판 공급망 윤곽…레이저 LPKF, 식각 태성, 검사는 테크밸리·이노메트리</a>
+        <span class="muted small">전자신문 11/12 09:30</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMidEFVX3lxTE1yc3ROeUhXUWNReUNKUFlJMF80VU0xeHZtREd2V2xiYXN5VldOR3dFZWMwMG5NbGgxSHdMdkxGZjhkLWpPWjhPWmpScDJfQWVqaVpvVkpXbE5Bd3ZTR3E5TXRPR3M4X1FmVjNNZnJ3V0NIN0Fo?oc=5" target="_blank" rel="noopener">대신證 &#34;삼성전기 과도한 하락…기판·MLCC 호조 속 재평가 시점&#34; |</a>
+        <span class="muted small">연합인포맥스 11/12 09:05</span></li>
+      <li><b>삼성SDI</b><a href="https://news.google.com/rss/articles/CBMidkFVX3lxTE9UcUNucElwNWE0RVRvR3F3TlpneDdOYlgzOG5xTVlmb3c1UVNGLUIwbDl2c2UyWWpDRzFTUHF6MmRtT01PT1FWanExb3VVWlVEQUJFY0xCZk1nYVlRdERUdmtQYXUxZXF4OXQ1eWVjWHBqNlFlNVE?oc=5" target="_blank" rel="noopener">삼성SDI·LG엔솔 선택한 BMW..유럽·미국 고전압 배터리 셀 공급, 업계 ‘주목’</a>
+        <span class="muted small">데일리카 11/12 08:05</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMiVEFVX3lxTE1kOEtJUUpvUmZGazRBaGZscFNyWFhGOE53OF9oZnJ2RlNkbk15R3ZyMk9CeTdDQ3VHN21BT2ZIZDhDenBTaUcwRUdtaXZOWXRXRkV2Zw?oc=5" target="_blank" rel="noopener">[전날 애프터마켓] 유가 안정에 한진칼 13%대 급등…BMW 배터리 품은 삼성SDI·원전주도 강세</a>
+        <span class="muted small">이투데이 11/12 07:32</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMihAFBVV95cUxNaHVaMFhrMGVPUURXbHZmU0lhczZVSERqS1RyYTdHdnFHT1E4cFJaSWNjdDN3SWNqdU1fbEpBdWlUcjZjN2kwd0lfVHpPbVBtRnVOMDBLMVJBVnhULUVHY2dad0tsRkxLc0Fkd051UHdGVHByRnpwU2szTUktelRLVXFuWVPSAZgBQVVfeXFMTkJfa29CX05YMGE3RjItRnVJUV9uUUNqY01TcURYazdmU1gyWmlWbnVNUy1GTzd3Y1RESXJ0SzFYbnR6NUFKSzJSTG51X1JYc2hDR0tDMWhpbF8yRVJzUndWYXZPdFRXbGoyQ2hCbXpWNDN2OU1MTjRpWGJqV2dQejYycWpSWW5tQS1zYmdtWnd4a282eEVYNXI?oc=5" target="_blank" rel="noopener">통상교섭본부장도 날아갔다… ‘K-배터리 유럽 생산기지’ 헝가리에 무슨 일이</a>
+        <span class="muted small">Chosunbiz 11/12 06:01</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMicEFVX3lxTE1ERU1BOEpPY0hSc1FtNERFQ2RocE1RUVNHdVlqT1ViWnJIOThuZEFsdUN2Z1VBMVVlTEhrcmh4RFI3RGpSVEJjTDBlbkRVYVVILTBySkI5SmJLdXZaOG9RLXV0eGRzSWtqZ2NocjlBbFTSAXRBVV95cUxNUlJEXzhodHl2bDhNaU1JMHpBNmw1U1JjaTJRbEdacUlqRG1TUjd6UmEzaDVjY3poeDV4TTJEdURDcm83SFE1VDg4dC1qbk16dDVmbWVxcFNvZDUzcDdzdk01bGp4bmdRLTVKSG02bFVnbS1saQ?oc=5" target="_blank" rel="noopener">BMW 그룹, 삼성SDI·LG엔솔과 배터리 셀 공급 계약 체결</a>
+        <span class="muted small">이뉴스투데이 11/12 01:54</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMimAFBVV95cUxOMklBbVJKZGhOUG9ia0dqeUQ0NnZDWGtIcDhXTEFfMTBidVFxNmUxXy1HLUw0VHRWa2YycERGWmZmaW10azhRTmFBQWFLQ2NoNEhMSUh2ZGJveEtkTW0wV2JWOUZZSEN2QWJYNW9aRmNHOTBabXZERVM5Y0JjRzR6UGg4Wm9KQlNJWEdEVmFUaGU4SWZBTG1BRw?oc=5" target="_blank" rel="noopener">&#34;유럽·미국 현지 공급망 강화&#34;...BMW 그룹, 삼성SDI 및 LG에너지솔루션과 배터리 셀 공급 계약체결…</a>
+        <span class="muted small">Naver Blog 11/11 23:24</span></li>
+      <li><b>삼성에스디에스</b><a href="https://news.google.com/rss/articles/CBMickFVX3lxTE5Leld0WE9xM2JUWVJjSnZFMHFyVTlGSmd3ZWFkWmdqTlJNWE9fQlJlVkE1QjZVTi1ZQlY1RkhVanFrOXl2RldvdlFXQ2FJbGtKNks1YWJ5ejFER0hKTGJFT0J3MEpyb09TYzBxbEdZbVZXdw?oc=5" target="_blank" rel="noopener">삼성 핵심기술 중국 등 유출 및 무단 사용 덜미 잡힌 업체 임직원 7명 기소</a>
+        <span class="muted small">한겨레 11/11 21:24</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMibkFVX3lxTE12eldQNXFIbzVNNkJHcjNsQkhPZ09TTC1nZjl1SEFKTzNYOURVeFRKX0Y4RjZ4U05PeEpLMEtZSzZDaWxuMVktOGlGX1ItcDFRX0NTNWlvaXlaTUpIWkx3bE9MczU4OEhhcXhvSHBB0gFyQVVfeXFMUDFrWkxMbWV4dEQ5RHItTmktRVAyYkJVeDA3UVN2ckZ4R3pQa2g1Q0d3N0dBc3hoVmpxQllPY1ktZWg3S1lwbnI1QzlvX3dfZmlKaW9DVHJIcmlMTUpBUWdHTjgwc3plcUF4ZmtBeU9KZGhR?oc=5" target="_blank" rel="noopener">삼성에스디에스 0.86% 내려 23만원대…AI 성장에도 차익 매물</a>
+        <span class="muted small">잡포스트 11/11 15:54</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMickFVX3lxTE8yZEdTVWNGTWdvamdUNnBxbUd2a0dKaVdnRG9NUzBpazQyNlQ0djlrcTYyMjRyUi0zMlNmODlyWXZwbUxMRVhFRTcydUctZUR4YVAyWFRoVUJlMmVDVFlhYk1YNmZyWGdyd3NEU3N6ck01UdIBckFVX3lxTE8yZEdTVWNGTWdvamdUNnBxbUd2a0dKaVdnRG9NUzBpazQyNlQ0djlrcTYyMjRyUi0zMlNmODlyWXZwbUxMRVhFRTcydUctZUR4YVAyWFRoVUJlMmVDVFlhYk1YNmZyWGdyd3NEU3N6ck01UQ?oc=5" target="_blank" rel="noopener">삼성에스디에스 23만원선 약세…클라우드 성장과 차익매물 공존</a>
+        <span class="muted small">잡포스트 11/11 14:58</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMibEFVX3lxTE9zdlp1enRqTjlkaFBUTXBJcVNUWjJHUzI5ank0aWtWYmFMSnZjYlNITktjVG9RNWMzNmxMc1lmYlQ4WFVvYVQwemQ2UXNkSkpqaHczMWFVcllhNllXMWlkSzJyY2Q3dFhxWlNHeQ?oc=5" target="_blank" rel="noopener">삼성에스디에스, 산업 전반 AI 전환 &#39;수혜&#39;…대규모 데이터센터 가동 릴레이 &#39;시동&#39;</a>
+        <span class="muted small">프라임경제 11/11 07:19</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMiaEFVX3lxTE5ESEhWaUtfc0lPVU1IR1FEOVpfdnVDSDFZQXZHLXZSYWdEM0QwdU5zaFFmbm1SdXVRckg1S2tlTWNEUVUwdkpUWWdpdndzYkFxOHVxUGNTWGhXdHl6OV8xMnBHX2xZOTFn0gFuQVVfeXFMT0dFN2dWLWwtdGUwN0VnMmdqSnFMWjFTV2pPcDhFUmdhbGs4cmp4UDduV21fbThRdGkwRDhuY21hMFRBVEdOWG13S0xMQWVtV3RYLThNUEZnWm1QUktqT2pncWdZTy1Nb28wd1I0WGc?oc=5" target="_blank" rel="noopener">[적중! 대박 예감] &#39;금양그린파워 삼성에스디에스 삼성전자&#39; 내일장 예감 좋은 대박 종목? - 머니투데이</a>
+        <span class="muted small">머니투데이 11/11 06:19</span></li>
+      <li><b>한미반도체</b><a href="https://news.google.com/rss/articles/CBMiXEFVX3lxTE0zV0ZJWS1QUnJzVG5fV09iUWhlZzZLWTJGdTE0dTdCRGJTRWlTQ1V5cTk5SVhRUkZYTWFsSW1VVTNiZ3psTG5sbk1jY1dyb25KTS1wRkNpSk1mc1Rj?oc=5" target="_blank" rel="noopener">한미반도체 주가 하락 중</a>
+        <span class="muted small">아시아뉴스통신 11/12 09:33</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMiUkFVX3lxTE5RMWZjcTg0Q29aN0ZiS0JWMFRYX0VtdGJBZFZFYW43eXRhSm0wSURSTXZNRUVnTmllWlpuUTBaRGxBaFhLVmJrYWVRYkVrcEoyUWc?oc=5" target="_blank" rel="noopener">삼성 ·SK하이닉스·한미반도체, 즉각 파장 없다지만..엔비디아 대중 규제에 초긴장</a>
+        <span class="muted small">한국정경신문 11/12 08:53</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMidEFVX3lxTE42Q0prWTdfc0JOeG5jTjVRWll4ZHhLemdqY3ROamlhTzNLU1dRdWU5c0JnSzRTdHFCZVNXbmYyb3pOZXBFVUE1SGFxejJhQlQtaE82NjZOaURqN1Z3SXg2WVBlVXVBTlFDT1FKQl91aEl3SmpQ?oc=5" target="_blank" rel="noopener">반도체 소부장도 실적 개선…전공정·소재로 온기 확산 |</a>
+        <span class="muted small">연합인포맥스 11/12 08:29</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMic0FVX3lxTFBrdzBzZlI2Y0tBZURHMzdadW9kWG9yc0pQNjBwd3lHRlpnWjNJRGZtVmJpQ2ZEMko0SmtTeVFCODZ1TlJHRm1SemppQS15V2NiUnFJMW1hVExkWDRzaFdmNTVYMEtCZmxZODFMTzZWaVp6LWfSAXdBVV95cUxPTnhZQTctMTBFaUVYV3JUdXVPVm1UVkJvTFA5dGZfQTMtZlpESEc3NFRwR20wZnBBUmQtRUNIYjJxamJwU0JRMHhfcDRPTTBWOUZnUEhkSmxKWm5xT2dHb1R4dV9ObC1SQUstYm1CeE9nbElydGttUQ?oc=5" target="_blank" rel="noopener">미국 반도체 장비주 거래대금 128억달러…한미반도체·테크윙에도 훈풍 부나</a>
+        <span class="muted small">핀포인트뉴스 11/12 07:44</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMiaEFVX3lxTE42NnlIV2U1UDBtVW51OG1GMGo5VTNtenJZVTlmcHA4SW11TThRR1BraVQwY21JMENReGJBSHdmWDlOdm9aOWJBT0tJOG9uaW9oV0FPWlY5djFQMDhILXZfeEd2c2VlWE9L?oc=5" target="_blank" rel="noopener">곽신 한미반도체 회장, 네팔 대홍수</a>
+        <span class="muted small">이투데이 11/11 17:16</span></li>
+      <li><b>주성엔지니어링</b><a href="https://news.google.com/rss/articles/CBMiS0FVX3lxTFBXU19IdWpWWFJ3YW55cndPOUk0eFhUcHZjT3Rsb193ZktzM2kxN0dxbGltaGJLbHAyMmhQdTEtQ041OENiank4cFIycw?oc=5" target="_blank" rel="noopener">[특징주] 주성엔지니어링, 장중 3%대 하락세… 17만2200원선 기록 : 기업주식정보</a>
+        <span class="muted small">재경일보 11/12 10:26</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMickFVX3lxTFBjYjlGbTMybWxSLXF0eGx3SjE3eWRYblVyOHhKbEFPSHprcUFGbG9wSmNLVV9Iemg4bkhHOUhPOFIzY2ZPWjFyTmpPc1pDMTNrQXVObDczLVREdUVGY2JJSHlvSTFBUUFOTzhwczhVM2JJdw?oc=5" target="_blank" rel="noopener">주성엔지니어링 주가, 11월 12일 장중 173,900원 2.52% 하락</a>
+        <span class="muted small">중앙이코노미뉴스 11/12 09:53</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMic0FVX3lxTE45Wmg2V19xdmNCS0NudzBJaS16ODhxaGc4emhQUHczTUhwbENvTG5pNzhpNkN6d2dBcUREb2VHNE0xb18wZ3QtdXlnUTkwRlkzYUlSXzA3MFhXMG5xVWxRQXYwUlRBNWRLN29qdE9ReEVJR03SAXdBVV95cUxPdUxIdS0zdnc2TzRtUloxTFp2bU93V2xwaW1QQ0VRam5CN0doeE5DdmRtUGZXZFlteDVoMXI4cTZkUUhab0djRE1PN3o3alYxaXI0OVAxYnI1bWxBQWhfSkptU3JLY1BpYUpQcGhYTEVnQkthWm5lZw?oc=5" target="_blank" rel="noopener">주성엔지니어링, LG이노텍 시총 추월…매출 80분의 1인데 기업가치는 1조원 더 높아</a>
+        <span class="muted small">핀포인트뉴스 11/12 09:41</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMic0FVX3lxTE5GRFQ1N1VfLVRnOXAxNVN3Ym9JdkEwelVuU1YwbzJweC1NVnZUMTVpRDVVY3FtTG9icGJ3UkNuR3pKSVR2M21ab0cxc1ZaU3pSZnRGRkJJVWxnMVM2WGFaYnRoVFFQMWQ4eHJhdG9kNVlJNVHSAXNBVV95cUxORkRUNTdVXy1UZzlwMTVTd2JvSXZBMHpVblNWMG8ycHgtTVZ2VDE1aUQ1VWNxbUxvYnBid1JDbkd6SklUdjNtWm9HMXNWWlN6UmZ0RkZCSVVsZzFTNlhhWmJ0aFRRUDFkOHhyYXRvZDVZSTVR?oc=5" target="_blank" rel="noopener">코스닥 &#39;질주&#39;...주성엔지니어링·심텍·제주반도체 &#39;점프&#39;</a>
+        <span class="muted small">초이스경제 11/12 01:27</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMid0FVX3lxTFBvZm1Xamt0MUdYMExPVS0xWkt6a05XMm9KbmdxbjB3MFFUS3hzeV96U2ZQaWU3a1YzQ2twc0pjSlhWYkdFUnFpbUp2QlY2UUFjWkpSaDRwSi0xbGpRQWpPUk9KS3V0Mnh4SDl5bV95c3F0RXh4WUZj0gF3QVVfeXFMUG9mbVdqa3QxR1gwTE9VLTFaS3prTlcyb0puZ3FuMHcwUVRLeHN5X3pTZlBpZTdrVjNDa3BzSmNKWFZiR0VScWltSnZCVjZRQWNaSlJoNHBKLTFsalFBak9ST0pLdXQyeHhIOXltX3lzcXRFeHhZRmM?oc=5" target="_blank" rel="noopener">[코스피 지수선물 옵션] 삼성전자·SK하이닉스 동반 상승…주성엔지니어링도 &#39;훨훨&#39;</a>
+        <span class="muted small">핀포인트뉴스 11/11 16:54</span></li>
+      <li><b>LG이노텍</b><a href="https://news.google.com/rss/articles/CBMic0FVX3lxTE45Wmg2V19xdmNCS0NudzBJaS16ODhxaGc4emhQUHczTUhwbENvTG5pNzhpNkN6d2dBcUREb2VHNE0xb18wZ3QtdXlnUTkwRlkzYUlSXzA3MFhXMG5xVWxRQXYwUlRBNWRLN29qdE9ReEVJR03SAXdBVV95cUxPdUxIdS0zdnc2TzRtUloxTFp2bU93V2xwaW1QQ0VRam5CN0doeE5DdmRtUGZXZFlteDVoMXI4cTZkUUhab0djRE1PN3o3alYxaXI0OVAxYnI1bWxBQWhfSkptU3JLY1BpYUpQcGhYTEVnQkthWm5lZw?oc=5" target="_blank" rel="noopener">주성엔지니어링, LG이노텍 시총 추월…매출 80분의 1인데 기업가치는 1조원 더 높아</a>
+        <span class="muted small">핀포인트뉴스 11/12 09:41</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMibEFVX3lxTE5LZmtrVGMySk9hellvcXNUcldQX1hqclJTd0hlMENGTDdnRnZZaVVPb2s0WjBhVkx5ZENhTmJpZmZxRDBvdFhMY3dVZ25wVlRPcFRtLXZSYmlBMlFiQUZHZ3pzTVZKNXY1c1d6TQ?oc=5" target="_blank" rel="noopener">LG이노텍, ‘넥슬라이드 C+’로 CES 혁신상… 시리즈 3년 연속 수상</a>
+        <span class="muted small">이코노미톡뉴스 11/12 08:59</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMiZ0FVX3lxTFBDUkNLNHZJbVhJckxPdXVxOGlRTXhqeXlRZ2Vya0VEeTZ1MTZDYnJvNzk3QnlaZklmdm5jVkFwT1l2WUVMa0JCd0E3RDVaUjJvbUJacmJtcTlFeGF4QkNIODJJTlR1bjA?oc=5" target="_blank" rel="noopener">LG이노텍, 동반성장지수 10년 연속 최우수…&#34;실질적 상생경영 강화&#34;</a>
+        <span class="muted small">팍스경제TV 11/12 08:57</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMigAFBVV95cUxPaHJ6MkpJbHNMU3J6MXU5ZlFOQ0xyaHVZcFdSZnRJcWlPY3oxWElUWXZGU1IwU3lMaXZSYUpDWVRyUlBieWVoMV9IQVlyNFR4dklMcmhLdW9LdGhPdHBqN3QzckQ1QXRfNF85em9mR2ZIZ3k1VGdyZzlmLUlKZW80Sg?oc=5" target="_blank" rel="noopener">LG이노텍, 기판 호황에 카메라 고도화 수혜…주가 저점 근접-SK</a>
+        <span class="muted small">이데일리 11/12 08:35</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMibEFVX3lxTE8yM0g1bVhVeGhmS3dQdkRLOEpfNVZiZmJ1Q19qY09fOTZOc0FTUFh2OVNCN2lIMTI0MTFXVl9yeXc4S1R3cU93Zm9CQW5weGs3dGhfU1BGcE5KU3ZpZjJzSFRGM21xdmpqZTNOcQ?oc=5" target="_blank" rel="noopener">LG이노텍, 동반성장지수 10년 연속 최우수 … 협력사 지원 3040억원</a>
+        <span class="muted small">워크투데이 11/12 00:57</span></li>
+      <li><b>이오테크닉스</b><a href="https://news.google.com/rss/articles/CBMilwFBVV95cUxOOC0wd0E3Y0pjODliU2hIdDhEWEF1c0ZVXzhGbXlYVlVMWVk1cFlmVlpJdEFWUTRNVE1mcnd2NFJaZEdsbkdLRTZ6Z09wZmpxSldQRzJ2WklTamd5eGlHNnlETkNvYkp5ZUFxZUJ6dFgtWE1fOWl3dFN5c2NxaFB0VFp4VnhHTUJSemV6RWFlRHc1RWZmU3Mw?oc=5" target="_blank" rel="noopener">이오테크닉스</a>
+        <span class="muted small">더나은미래 11/12 09:35</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMiWEFVX3lxTE12dm1uN1hJNmJMQWszTkYwTWZwLTUxUlJSRDJwRW1LeVVWX3d1YmZXdE1TZUtta1NUN3ZoS05QeV9iSEoyTlg0TzQtOENyd2lOYTAteDNMLULSAVhBVV95cUxNdnZtbjdYSTZiTEFrM05GME1mcC01MVJSUkQycEVtS3lVVl93dWJmV3RNU2VLbWtTVDd2aEtOUHlfYkhKMk5YNE80LThDcndpTmEwLXgzTC1C?oc=5" target="_blank" rel="noopener">코스닥, 4거래일 만에 700선 탈환…美 긴축 우려 밀어낸 AI 기대감</a>
+        <span class="muted small">아주경제 11/11 17:37</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMid0FVX3lxTE43Z010RU10UlNtazVsVjRHT2dDdnR3WDB3LTZ5end3WDJlLS1PLVBYQ0Rvc2lkenB3cEZ4TDRZZGlVNHpjMDk2ekxNdnZ4clFVVWQxSUF5eTBDOGdVTWh3TkdGaHRwZTZqRnBud19RbVQzbmVZNWtN0gF3QVVfeXFMTjdnTXRFTXRSU21rNWxWNEdPZ0N2dHdYMHctNnl6d3dYMmUtLU8tUFhDRG9zaWR6cHdwRnhMNFlkaVU0emMwOTZ6TE12dnhyUVVVZDFJQXl5MEM4Z1VNaHdOR0ZodHBlNmpGcG53X1FtVDNuZVk1a00?oc=5" target="_blank" rel="noopener">[코스닥 기관] 심텍·에코프로비엠 담고…루닛·바로팜 대거 팔았다</a>
+        <span class="muted small">핀포인트뉴스 11/11 16:55</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMid0FVX3lxTE9YVjlHc1VlZmR0MlZiUnA3QXl3dG5TNW1IenpsLXUwZ1dkSUpCOEJXeVl6SllwcDB2QnZydFF0RFdWM2hIblU5UHlzaVNMRjFtVnFCZXlVSjNXTHFQLWRQS0hMZjJVRkktdnJZa0N1TFNOVkNnTE1Z0gF3QVVfeXFMT1hWOUdzVWVmZHQyVmJScDdBeXd0blM1bUh6emwtdTBnV2RJSkI4Qld5WXpKWXBwMHZCdnJ0UXREV1YzaEhuVTlQeXNpU0xGMW1WcUJleVVKM1dMcVAtZFBLSExmMlVGSS12cllrQ3VMU05WQ2dMTVk?oc=5" target="_blank" rel="noopener">[코스닥 외국인] 주성엔지니어링 에코프로 사고 심텍 이오테크닉스 팔아</a>
+        <span class="muted small">핀포인트뉴스 11/11 16:37</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMiWkFVX3lxTE1USUE2bWFmb1E5TmNlRU1VUW1UTUdxNG9nbTAtUmxNeVd1RnBGekxUNzRGd1YyWTZkOEVEbVlDVkJJMmg1YkNDcnI4NGJmRXRPZXQ0RGFZZ0M1dw?oc=5" target="_blank" rel="noopener">코스피 5300선 회복...외국인 매수세 전환, 코스닥은 5% 급등[fn오후시황]</a>
+        <span class="muted small">파이낸셜뉴스 11/11 14:04</span></li>
+      <li><b>리노공업</b><a href="https://news.google.com/rss/articles/CBMiWkFVX3lxTFBBN2tsVWwzbzFtZTJEdzhjN0JROGVOQlFIY0lnSzNpTUg2Ykp5LTU1dVM5YlktWlJ2WTIxV2RSX243R1JPZUR3QVVaaS1vT0JhYTJ3ZWh4dkxhUQ?oc=5" target="_blank" rel="noopener">코스피, 개인 매수세 속 5400선 공방…삼성전자 2%대↑</a>
+        <span class="muted small">한국경제 11/12 10:53</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMiaEFVX3lxTE9KZnB0X1BpMjJhbXNrY3pjNDVjUWhXQ0lOeV8wT3pucjVDcndiTG5IcHhNUDZRbUt2MG5PNzRycGZSaWcxeEdyX3BTQ3JsdEJoUGx3MkNxak9PeWNlR29pbXBtdXJwS1Qw0gFuQVVfeXFMTkhLSEtWZUlVa2pxMFRZZ0gxLVRjTnRkY0FyRXBhaEZjaHNpYVByamhjMThOOUVzRVA5cnBVbE5LRXFkazR0Q0ZvNnFDR2hkZW90dk5RZzBrbjl2UktPdmIyWjYwMW9uc0Qydzk1MFE?oc=5" target="_blank" rel="noopener">&#34;연저점은 너무했지&#34; 코스닥 연이틀 급등…700 문턱 - 머니투데이</a>
+        <span class="muted small">머니투데이 11/12 10:36</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMic0FVX3lxTE5GRFQ1N1VfLVRnOXAxNVN3Ym9JdkEwelVuU1YwbzJweC1NVnZUMTVpRDVVY3FtTG9icGJ3UkNuR3pKSVR2M21ab0cxc1ZaU3pSZnRGRkJJVWxnMVM2WGFaYnRoVFFQMWQ4eHJhdG9kNVlJNVHSAXNBVV95cUxORkRUNTdVXy1UZzlwMTVTd2JvSXZBMHpVblNWMG8ycHgtTVZ2VDE1aUQ1VWNxbUxvYnBid1JDbkd6SklUdjNtWm9HMXNWWlN6UmZ0RkZCSVVsZzFTNlhhWmJ0aFRRUDFkOHhyYXRvZDVZSTVR?oc=5" target="_blank" rel="noopener">코스닥 &#39;질주&#39;...주성엔지니어링·심텍·제주반도체 &#39;점프&#39;</a>
+        <span class="muted small">초이스경제 11/12 01:27</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMibkFVX3lxTFBiMVMwWmdNTFRUalBqdVRKSmJndUQ4Q3Z4WnR6bGZQLXE1QlFpcGxqSzVWWW5GbW1PclU5LU5oS25icmJmWGpXSHN0MG9NWWpHdU5DWmhhb05GTjhiNkU0amhGMlpNQ2NOQlV6MHBn?oc=5" target="_blank" rel="noopener">코스닥, 5%대 급등에 700선 회복...에코프로, 에코프로비엠 상승</a>
+        <span class="muted small">이코노뉴스 11/11 21:30</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMibkFVX3lxTFBiUTZwbVROZ1JybWE4TjdybUp3SWw2aWJGY2cwWGNDTTFQRWJ2Z3lBRmppTTJTb3RVaXdmcDN2RTdfcUszb09Ieml0QlpMcV80YVZzQi1fM1IybU45bm8wcXBrb0Q4aFNOQ0pBOW930gFuQVVfeXFMUGJRNnBtVE5nUnJtYThON3JtSndJbDZpYkZjZzBYY0NNMVBFYnZneUFGamlNMlNvdFVpd2ZwM3ZFN19xSzNvT0h6aXRCWkxxXzRhVnNCLV8zUjJtTjlubzBxcGtvRDhoU05DSkE5b3c?oc=5" target="_blank" rel="noopener">코스피 5300·코스피 700 회복…美 AI호재에 반도체 훈풍 - 머니투데이</a>
+        <span class="muted small">머니투데이 11/11 16:06</span></li>
+    </ul>
+  </details>
+</section>
+<section id="kr_hc">
+  <h2>국내 · 헬스케어</h2>
+<div class="card"><div class="label">섹터 요약</div>오늘(11월 12일 장중) 헬스케어 상위 종목은 대부분 내렸습니다. 한미약품(-8.45%)이 가장 크게 빠졌고, 셀트리온과 SK바이오팜만 소폭 올랐습니다. 거래량은 20일 평균의 0.14~0.65배 수준으로 적었습니다. 뉴스는 세 가지가 중심입니다. 삼성바이오로직스 유상증자 청약률 96.8%, 미국 약가 규정 변경이 알테오젠에 미칠 영향, 해외 비만약 반입 허용이 한미약품에 미칠 영향입니다.</div>
+  <div class="table-wrap">
+  <table>
+    <thead><tr>
+      <th>종목 (시가총액순)</th><th>현재가</th><th>1일</th><th>1주</th><th>1개월</th><th>3개월</th>
+      <th>거래량<br>(20일 평균 대비)</th><th>52주 고점 대비</th><th>시가총액</th><th>예상 PER</th>
+      <th>목표가 괴리</th><th>애널리스트</th>
+    </tr></thead>
+    <tbody>
+    <tr class="deep">
+      <td>삼성바이오로직스<span class="sym">207940.KS</span></td>
+      <td>1,422,000원</td>
+      <td class="down">-0.6%</td>
+      <td class="down">-6.4%</td>
+      <td class="up">+20.3%</td>
+      <td class="down">-9.4%</td>
+      <td>0.2배</td>
+      <td class="down">-27.6%</td>
+      <td>66.2조</td>
+      <td>30.6</td>
+      <td class="up">+32.1%</td>
+      <td>매수 <span class="muted">(27명)</span></td>
+    </tr>
+    <tr class="">
+      <td>셀트리온<span class="sym">068270.KS</span></td>
+      <td>207,000원</td>
+      <td class="flat">+0.0%</td>
+      <td class="down">-3.7%</td>
+      <td class="up">+15.1%</td>
+      <td class="up">+3.0%</td>
+      <td>0.2배</td>
+      <td class="down">-12.5%</td>
+      <td>47.2조</td>
+      <td>26.4</td>
+      <td class="up">+33.0%</td>
+      <td>매수 <span class="muted">(22명)</span></td>
+    </tr>
+    <tr class="deep">
+      <td>알테오젠<span class="sym">196170.KQ</span></td>
+      <td>177,700원</td>
+      <td class="down">-3.2%</td>
+      <td class="down">-16.0%</td>
+      <td class="down">-20.8%</td>
+      <td class="down">-48.9%</td>
+      <td>0.3배</td>
+      <td class="down">-58.7%</td>
+      <td>12.4조</td>
+      <td>32.3</td>
+      <td class="up">+101.7%</td>
+      <td>매수 <span class="muted">(6명)</span></td>
+    </tr>
+    <tr class="">
+      <td>SK바이오팜<span class="sym">326030.KS</span></td>
+      <td>86,800원</td>
+      <td class="up">+0.1%</td>
+      <td class="down">-4.2%</td>
+      <td class="up">+23.5%</td>
+      <td class="down">-2.1%</td>
+      <td>0.3배</td>
+      <td class="down">-38.3%</td>
+      <td>6.8조</td>
+      <td>17.0</td>
+      <td class="up">+51.2%</td>
+      <td>매수 <span class="muted">(13명)</span></td>
+    </tr>
+    <tr class="deep">
+      <td>한미약품<span class="sym">128940.KS</span></td>
+      <td>462,000원</td>
+      <td class="down">-9.2%</td>
+      <td class="down">-0.6%</td>
+      <td class="up">+14.2%</td>
+      <td class="up">+13.4%</td>
+      <td>0.8배</td>
+      <td class="down">-26.2%</td>
+      <td>5.9조</td>
+      <td>29.4</td>
+      <td class="up">+37.7%</td>
+      <td>매수 <span class="muted">(11명)</span></td>
+    </tr>
+    <tr class="">
+      <td>유한양행<span class="sym">000100.KS</span></td>
+      <td>78,200원</td>
+      <td class="down">-1.0%</td>
+      <td class="down">-5.3%</td>
+      <td class="up">+7.6%</td>
+      <td class="down">-4.6%</td>
+      <td>0.2배</td>
+      <td class="down">-37.4%</td>
+      <td>5.8조</td>
+      <td>27.5</td>
+      <td class="up">+43.3%</td>
+      <td>매수 <span class="muted">(17명)</span></td>
+    </tr>
+    <tr class="">
+      <td>삼천당제약<span class="sym">000250.KQ</span></td>
+      <td>184,800원</td>
+      <td class="down">-0.8%</td>
+      <td class="up">+4.6%</td>
+      <td class="down">-10.3%</td>
+      <td class="down">-2.1%</td>
+      <td>0.3배</td>
+      <td class="down">-84.4%</td>
+      <td>4.3조</td>
+      <td>-</td>
+      <td class="flat">-</td>
+      <td>-</td>
+    </tr>
+    <tr class="">
+      <td>HLB<span class="sym">028300.KQ</span></td>
+      <td>29,100원</td>
+      <td class="down">-2.7%</td>
+      <td class="down">-10.2%</td>
+      <td class="down">-30.7%</td>
+      <td class="down">-28.5%</td>
+      <td>0.5배</td>
+      <td class="down">-57.3%</td>
+      <td>3.9조</td>
+      <td>-</td>
+      <td class="flat">-</td>
+      <td>-</td>
+    </tr>
+    <tr class="">
+      <td>SK바이오사이언스<span class="sym">302440.KS</span></td>
+      <td>38,750원</td>
+      <td class="down">-3.0%</td>
+      <td class="up">+4.9%</td>
+      <td class="up">+6.7%</td>
+      <td class="up">+4.0%</td>
+      <td>0.3배</td>
+      <td class="down">-30.8%</td>
+      <td>3.0조</td>
+      <td>-</td>
+      <td class="down">-6.6%</td>
+      <td>비중축소 <span class="muted">(5명)</span></td>
+    </tr>
+    <tr class="">
+      <td>파마리서치<span class="sym">214450.KQ</span></td>
+      <td>243,000원</td>
+      <td class="down">-1.8%</td>
+      <td class="up">+8.0%</td>
+      <td class="down">-10.3%</td>
+      <td class="down">-40.7%</td>
+      <td>0.2배</td>
+      <td class="down">-54.5%</td>
+      <td>2.5조</td>
+      <td>11.3</td>
+      <td class="up">+76.0%</td>
+      <td>강력매수 <span class="muted">(15명)</span></td>
+    </tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="muted small" style="margin-top:6px">
+    기준일 2026-11-12
+<b>장중 가격</b>(리포트를 만든 시점, 거래량도 장중 누적)    · 예상 PER = 주가 ÷ 향후 12개월 예상 주당순이익 · 목표가 괴리 = 애널리스트 평균 목표가와 현재가 차이
+<br>※ 국내 종목의 예상 PER·목표가·애널리스트 의견은 야후 집계라 갱신이 늦거나 부정확할 수 있습니다. 주가가 급변한 뒤에는 목표가 괴리가 과장되어 보일 수 있으니 참고만 하세요.  </div>
+
+  <div class="card deepcard" style="margin-top:14px">
+    <div class="head">
+      <h3>삼성바이오로직스 <span class="sym">207940.KS</span></h3>
+      <span class="price">1,422,000원</span>
+      <span class="down">-0.56%</span>
+      <span class="counts">뉴스 호재 3 · 악재 0 · 중립 1</span>
+    </div>
+    <div class="oneline">2.7조 유상증자 청약률 96.8% 소식 속에 주가는 -0.77%로 약보합이고, 거래량은 평소의 0.2배로 적습니다.</div>
+    <ul class="news">
+      <li><span class="tag pos">호재</span><span>약 2.7조 원(2조6650억 원) 유상증자에서 기존 주주·우리사주 청약률이 96.83%로, 100%에 가까웠다는 보도입니다. <span class="src"><a href="https://news.google.com/rss/articles/CBMiWkFVX3lxTE1XcTNISks2VU4yLV9MSzJQRDJlT1ViVmhJaUVfSUQzN2l6blJRdzhQU2VRVlFramxwMElDZEU5MjlYTWpEdEVNWGZ1ZHpiN05XSkhTbDFsSnAwQQ?oc=5" target="_blank" rel="noopener" title="삼성바이오로직스, 2조6650억 원 유상증자 청약률 96.8% 기록">[위클리피플 인물지식가이드저널]</a><a href="https://news.google.com/rss/articles/CBMiYEFVX3lxTFBRMXBTQjdSMUJaYmFVNlYySDJTTXlnMm9udnhHRThJVG5IVE9IZWNTZXhNUGN5c1o5VzFrZTlMend4azB2aGllMENPdXFVZ25tajdLQVV5c25lOGNNdHdGVA?oc=5" target="_blank" rel="noopener" title="삼성바이오로직스, 2.7조 유상증자 청약률 96.8%">[뉴스1]</a><a href="https://news.google.com/rss/articles/CBMiZEFVX3lxTE5ZOFVMZlNSemFieG1KMGlIa2NuN2ZyT0prMUJqT0duOTE1V0hwSloxQ2M0cllrLU9BRWNheG5yMFJuY2NaOFZDblFUdWdQSWJqcTNSa2c2ZklPZV9pS2hYdXVQbWo?oc=5" target="_blank" rel="noopener" title="삼성바이오로직스, 유상증자 주주·우리사주 청약률 96.83%">[메디포뉴스]</a><a href="https://news.google.com/rss/articles/CBMicEFVX3lxTFBrX05COTBoTEh0YW03ZkpCZ2d2bGN3UVNEZUJoY0RDVVhvZ28tV3BzakFGNF9NeHhpRjhucFkwcFhpNGEySFNnLTRNRGlQMEI4bjk1SXJINDlpWlh5V044amZJMWpMeVNCajdYcHViOXo?oc=5" target="_blank" rel="noopener" title="삼성바이오로직스 유상증자 청약률 96.8% By FinancialPost">[Investing.com 한국어]</a><a href="https://news.google.com/rss/articles/CBMiZ0FVX3lxTE5pV3gxSkRWR2Zienk5YXRyUWMzUGY3SUctWDZlNDlObWtNTS11S1RLb0R4YjFoU3BTNkZWdzh5Smpmbmg5d3ZNTUYyT2dmcDd2ZGNfZUlIN2xOaW1hWkJkM2luUVBSekU?oc=5" target="_blank" rel="noopener" title="삼성바이오로직스 &#39;2.7조&#39; 유상증자, 청약률 100% 육박">[메드월드뉴스]</a></span></span></li>
+      <li><span class="tag neu">중립</span><span>이번 증자로 폴리펩타이드그룹 인수에 속도가 붙을 것이라는 보도입니다. 조달한 자금이 인수에 쓰일 것으로 보입니다. <span class="src"><a href="https://news.google.com/rss/articles/CBMibEFVX3lxTE9fcGwzN2puTUgzQzhjX0pIZUswT3F5RWxiRC1jb0N0VHR3QUo0akh0eGdaUG4zOEU2bklYOF9PMl9uT2NkVkE3NHpSSVpnMW9YLXh4bnp4aDFSbGY0NDZPbUZCUU9rOFpSUm1XSg?oc=5" target="_blank" rel="noopener" title="삼성바이오로직스, 2.7조 유증 청약률 96.8%…폴리펩타이드그룹 인수 속도">[메디컬투데이]</a></span></span></li>
+      <li><span class="tag pos">호재</span><span>삼성그룹의 지원 규모가 4.9조 원이라는 제목의 기사가 나왔습니다. &#39;모기업 지원이 든든한 바이오 기업&#39;이라는 시각입니다. <span class="src"><a href="https://news.google.com/rss/articles/CBMiaEFVX3lxTE1MOV8wLXQwWkZuNjJwT2ZPcDdpeV9Obk5ZQXg1MHIzR2ZnWDRVSjM5akJZR3Rmd2IzdTFZSnVsVHVKbHhTb1lGVFpiSFFPbndQaW54SHdmYmY3ZEVzREQ0UEN3ZWo3bF9H?oc=5" target="_blank" rel="noopener" title="삼성 4.9조·롯데 1.5조…&#39;금수저 바이오&#39;의 든든한 모기업 지원">[메디팜스투데이]</a></span></span></li>
+      <li><span class="tag pos">호재</span><span>K-바이오 기업의 영업이익률이 최대 45%로 전통 제약사보다 훨씬 높다는 보도가 있었고, ESG 평가에서 &#39;A+&#39;를 받은 것으로 알려졌습니다. <span class="src"><a href="https://news.google.com/rss/articles/CBMic0FVX3lxTE9ZUmdWVVRrRThpcjVISGpaVUIwMXFYSVNROUc5bFNDdk5mWVFURmxTM3hocndUckh5SnlUaThuRmlJa1ItNHJZbnU0SGVha3RXanFBcmZDVTRvWVMwY28tZHhqU3gxdXhZSU9kZmpRWF84Q3PSAXZBVV95cUxNMktRblB2ZkI5T2dESDBxM1cwc3hRMlZsWm5Zb0I4OF9hTkxwY0NVNXBWRXFuS3BDb29aTUlKWG92Mm9PTC1WU19qMVNtRlA2VnZKYlpnRFEtcGJ6Y0xlMnZWVFZuSDF0bzhnclg4UFlMd1FaUmJ3?oc=5" target="_blank" rel="noopener" title="K-바이오, 영업이익률 &#39;최대 45%&#39; 벽 넘어...전통제약사 &#39;압도&#39;">[메디소비자뉴스]</a><a href="https://news.google.com/rss/articles/CBMiaEFVX3lxTE5VcEpzdXl2NDh5U04tcjVqY3U2d1o0MXVSZUphNXc3cGtqeTFSUXFFQ3dLaFdIRFBTQ3dPLUJ4bkxGMDJKTTZwOG5OUjlRaUxOSDBvMXppSVBJeThGNEZUZlFSMkpycVM2?oc=5" target="_blank" rel="noopener" title="동아제약·삼성바이오·HK이노엔·SK케미칼 ‘A+’">[데일리메디]</a></span></span></li>
+    </ul>
+    <div class="three">
+      <div class="box p"><div class="label">긍정 요인</div><ul><li>최근 두 분기 영업이익률이 약 44~46%로 높습니다. 2026년 3월 분기는 매출 약 1조2571억 원에 영업이익 약 5808억 원, 6월 분기는 매출 약 1조3209억 원에 영업이익 약 5864억 원입니다.</li><li>유상증자 청약률이 96.8%로 높아 자금 조달은 무난하게 끝난 것으로 보입니다.</li><li>애널리스트 27명의 평균 의견은 &#39;매수&#39;이고, 평균 목표주가는 현재가보다 32.43% 높습니다.</li></ul></div>
+      <div class="box n"><div class="label">부정 요인</div><ul><li>유상증자로 주식 수가 늘어나 기존 주주의 지분 가치가 희석될 수 있습니다.</li><li>주가는 52주 고점보다 27.79% 낮고, 최근 1주 -6.64%, 3개월 -9.56%입니다.</li><li>예상 실적 기준 PER(주가÷예상 주당순이익)이 30.58배로, 이익에 비해 주가가 높게 평가된 편입니다.</li></ul></div>
+      <div class="box w"><div class="label">체크 포인트</div><ul><li>폴리펩타이드그룹 인수가 어떤 조건으로 언제 마무리되는지, 인수 후 실적에 얼마나 보탬이 되는지</li><li>2027년 1월 20일 실적 발표: 매출 추정치 약 1조5281억 원, 주당순이익 추정치 약 10,195원을 달성하는지</li><li>2025년 12월 분기 매출(약 3086억 원)이 영업이익(약 3781억 원)보다 작게 나와 있습니다. 회계 처리 때문인지 데이터 오류인지 확인이 필요합니다.</li></ul></div>
+    </div>
+    <div class="overall"><div class="label">종합 (중장기 관점)</div>이익률이 높은 위탁생산(CDMO) 사업이 실적을 받치고 있고, 이번 대규모 증자로 인수를 통한 사업 확장에 나서는 단계로 보입니다. 앞으로는 늘어난 주식 수를 감안해도 인수 효과로 주당 이익이 커지는지가 핵심입니다. 1개월 동안 20.05% 올랐다가 1주 동안 6.64% 내리는 등 주가 변동이 큰 편입니다.</div>
+
+    <div class="fin">
+      <div class="label">최근 분기 실적 (야후 파이낸스 기준)</div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>분기</th><th>2025-09</th><th>2025-12</th><th>2026-03</th><th>2026-06</th></tr></thead>
+        <tbody>
+          <tr><td>매출</td><td>1.7조</td><td>3,086억</td><td>1.3조</td><td>1.3조</td></tr>
+          <tr><td>영업이익</td><td>7,288억</td><td>3,781억</td><td>5,808억</td><td>5,864억</td></tr>
+          <tr><td>순이익</td><td>5,745억</td><td>5,100억</td><td>4,692억</td><td>4,307억</td></tr>
+        </tbody>
+      </table></div>
+      <div class="muted small" style="margin-top:6px">
+        다음 실적 발표: 2027-01-20
+ · 다음 분기 매출 예상 1.5조      </div>
+    </div>
+  </div>
+  <div class="card deepcard" style="margin-top:14px">
+    <div class="head">
+      <h3>한미약품 <span class="sym">128940.KS</span></h3>
+      <span class="price">462,000원</span>
+      <span class="down">-9.23%</span>
+      <span class="counts">뉴스 호재 2 · 악재 1 · 중립 1</span>
+    </div>
+    <div class="oneline">해외 비만약 반입 허용 소식에 비만약 가격 경쟁력 우려가 커지며 장중 -8.45% 급락했습니다.</div>
+    <ul class="news">
+      <li><span class="tag neg">악재</span><span>해외 비만약 반입이 허용되면서 한미약품 비만약의 가격 경쟁력이 약해질 수 있다는 우려가 나왔고, 주가가 7.27% 급락했다는 보도입니다. <span class="src"><a href="https://news.google.com/rss/articles/CBMiWkFVX3lxTE0wVHVsa3NKa1otcml2VDlYZGVNeTRsSm9LbnhJS193bWpKS1VKN2FFYnlJTnRNWVBCZTROdUlocGowTXlLbDV4c0I0WnFYWl9sY1NFMDljbXhxdw?oc=5" target="_blank" rel="noopener" title="&#34;가격 경쟁력 사라지나&#34; 한미약품, 해외 비만약 반입 허용에 7.27% 급락">[한국경제]</a></span></span></li>
+      <li><span class="tag neu">중립</span><span>비만치료제 &#39;에페&#39;가 수익성을 좌우할 것이라는 분석이 나왔습니다. 동시에 미국 FDA의 GLP-1 계열 비만약 안전성 경고가 변수로 꼽혔습니다. 최대 영업이익이 예상된다는 기사도 있습니다. <span class="src"><a href="https://news.google.com/rss/articles/CBMia0FVX3lxTE1XemxWXzB1MzdyUklfdHZPS2dxTGhMQ1Q4YTNqNXhyOHFfanczWHlDcDRWaEUzMEpQWW5IcHZBbkRHeEFicDNuMWpsa1YxVkJadFVLT0xoNVRIM1pLb2V6RG81TENQdm92emJn?oc=5" target="_blank" rel="noopener" title="비만치료제 ‘에페’로 수익 확대 노리는 한미약품…FDA GLP-1 안전성 경고 변수">[CEO스코어데일리]</a><a href="https://news.google.com/rss/articles/CBMicEFVX3lxTE9uZFBySVdBZEwxTVJ3c1V4cVdwaGVRSC1JWUVjNDA3TjAyM01ud1laS1RweGpQWFIzUm5HVW14UXhpaTQyQnBwS3NueENhQ0xjaWE5aWtoSUZsaGhhY05BSTVtU2laUGh5MV9fNTBjb1Y?oc=5" target="_blank" rel="noopener" title="최대 영업익 예상 한미약품, 수익성 키 ‘에페’에 달렸다">[위키리크스한국]</a></span></span></li>
+      <li><span class="tag pos">호재</span><span>경구용 항응고제 &#39;에독스반정&#39;을 출시해 항응고제 제품군을 넓혔다는 보도입니다. <span class="src"><a href="https://news.google.com/rss/articles/CBMiZ0FVX3lxTE9QVlZ6emR2dWg5ZDVFZ0g0ZHgxM1VFM01VNGRIME5INlVNSnFJTXp5Tjlqc1k1X3pGR2d6eE9KQVlVWVlJLU1GNUNxTDZ0NzRDMUh1WlpLLVF6RlNqaUxCWXpvM1ZTbHM?oc=5" target="_blank" rel="noopener" title="한미약품, ‘에독스반정’ 출시…항응고제 포트폴리오 확대">[메드월드뉴스]</a><a href="https://news.google.com/rss/articles/CBMiZ0FVX3lxTFBTel9ZQW1GSlpmemx1TkFraVZrSnA0UHp6YXVtMEdGS1V2OVRHV0NCMXp2cnJNZGZERmFiX1BzZ3hnSW9pREFSUUVjakNidWhsaWhRMVRCcko3em9vaS15VFA0eWF4QzQ?oc=5" target="_blank" rel="noopener" title="[Pharma Report] 한미약품·HK이노엔, 에독사반 항응고제 출시…동화약품, 물 없이 마시는 멀미약 발매 外">[헬스코리아뉴스]</a><a href="https://news.google.com/rss/articles/CBMiY0FVX3lxTE8wSHRIaExTZXoydkZQNVhxUm1tNjlkVFluQVExbk9QbS1kNnBnNEg5dXItcWVYUmppZkREYWpzTmswT0l4WVVvZGE0eUZQQm1kNGlRcDZlTVgyRWdvZlBVWDRIRQ?oc=5" target="_blank" rel="noopener" title="한미약품, 경구용 항응고제 &#39;에독스반정&#39; 출시… DOAC 포트폴리오 확장">[보건신문]</a></span></span></li>
+      <li><span class="tag pos">호재</span><span>한미약품이 기술을 넘긴 MASH(지방간염) 신약이 임상 2b상에서 1차 평가지표를 충족했다는 내용이 블로그에 올라왔습니다. 공식 발표인지는 따로 확인이 필요합니다. 근육을 지키는 &#39;마이오스타틴 저해제&#39;를 다룬 분석 기사도 있습니다. <span class="src"><a href="https://news.google.com/rss/articles/CBMijwFBVV95cUxNbm1fOGx6QXZNaUZHaFI5dHoybFRYTnB3a2tOTl9WUHBkWGNmOFFyeFV6QXpWOTFNNzRCVXBMTVpCTmxKQ0hFRUFjN21BR1huc2g1WFlnQWJHRlRTdGtWSWxDa2NPZHZKYWE0VUNteWMtVGVNTDNleVRMVHNacEVUeVdWU1BieXhlS1RyV184UQ?oc=5" target="_blank" rel="noopener" title="한미약품 기술이전 MASH 신약, 2b상서 1차 평가지표 충족 : 네이버 블로그">[Naver Blog]</a><a href="https://news.google.com/rss/articles/CBMiV0FVX3lxTE9JUTBxVk1qQ0pLOE9jQmxLa2hxQzF3a3ZpbmhnaU53S0lFQkRHamxNcVVST2JtZzd6clBxRHZxcXliS2NxU0ZZQ1FiM2xaU2VZSk1WWXJYWQ?oc=5" target="_blank" rel="noopener" title="한미약품, 근육보존 &#39;마이오스타틴 저해제&#39; 다른 이유?">[바이오스펙테이터]</a></span></span></li>
+    </ul>
+    <div class="three">
+      <div class="box p"><div class="label">긍정 요인</div><ul><li>2026년 6월 분기 매출은 약 4672억 원, 영업이익은 약 1311억 원으로 최근 4개 분기 중 가장 많습니다.</li><li>신제품(에독스반정) 출시와 기술수출 신약의 임상 진전 소식 등 이익원이 여러 갈래입니다.</li><li>애널리스트 11명의 평균 의견은 &#39;매수&#39;이고, 평균 목표주가는 현재가보다 36.56% 높습니다.</li></ul></div>
+      <div class="box n"><div class="label">부정 요인</div><ul><li>해외 비만약 반입 허용으로 비만약 사업의 가격 경쟁력이 약해질 수 있다는 우려가 있습니다.</li><li>FDA의 GLP-1 안전성 경고가 비만약 사업의 변수로 지적됐습니다.</li><li>분기 영업이익이 약 536억~1311억 원 사이로 들쭉날쭉합니다.</li></ul></div>
+      <div class="box w"><div class="label">체크 포인트</div><ul><li>해외 비만약 반입 허용의 구체적인 범위와, 그것이 &#39;에페&#39; 판매에 실제로 미치는 영향</li><li>FDA GLP-1 안전성 경고가 앞으로 어떻게 진행되는지</li><li>다음 분기 매출이 추정치 약 6046억 원에 도달하는지, 최대 영업이익 전망이 실제로 맞는지</li></ul></div>
+    </div>
+    <div class="overall"><div class="label">종합 (중장기 관점)</div>최근 분기 실적은 좋아지는 흐름이지만, 앞으로의 성장 기대가 상당 부분 비만약 &#39;에페&#39;에 걸려 있습니다. 그래서 오늘처럼 비만약 관련 제도나 규제 뉴스에 주가가 크게 흔들릴 수 있습니다. 중장기로는 비만약 경쟁 환경과 기술수출 신약의 임상 결과가 함께 중요합니다.</div>
+
+    <div class="fin">
+      <div class="label">최근 분기 실적 (야후 파이낸스 기준)</div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>분기</th><th>2025-09</th><th>2025-12</th><th>2026-03</th><th>2026-06</th></tr></thead>
+        <tbody>
+          <tr><td>매출</td><td>3,623억</td><td>4,330억</td><td>3,929억</td><td>4,672억</td></tr>
+          <tr><td>영업이익</td><td>551억</td><td>833억</td><td>536억</td><td>1,311억</td></tr>
+          <tr><td>순이익</td><td>401억</td><td>481억</td><td>455억</td><td>833억</td></tr>
+        </tbody>
+      </table></div>
+      <div class="muted small" style="margin-top:6px">
+        다음 실적 발표: 미정
+ · 다음 분기 매출 예상 6,046억      </div>
+    </div>
+  </div>
+  <div class="card deepcard" style="margin-top:14px">
+    <div class="head">
+      <h3>알테오젠 <span class="sym">196170.KQ</span></h3>
+      <span class="price">177,700원</span>
+      <span class="down">-3.16%</span>
+      <span class="counts">뉴스 호재 2 · 악재 1 · 중립 1</span>
+    </div>
+    <div class="oneline">미국 약가 규정 변경 우려로 하락이 이어지며 장중 -3.81%, 3개월 -49.28%입니다.</div>
+    <ul class="news">
+      <li><span class="tag neg">악재</span><span>미국 약가 규정 변경으로 피하주사 제형 키트루다(키트루다SC)의 로열티가 줄 수 있다는 우려가 나왔고, 주가가 16% 급락했다는 보도입니다. <span class="src"><a href="https://news.google.com/rss/articles/CBMia0FVX3lxTE9iT1dWak5Fc21PaEx0YkpVVFRSczdBZUVhelRZWVVlXzRkLUtjemw3SFpZZzljczVyVWtnZ0JDaW9sX2wwcGRjR2VhVHpUWjEzc1RET2pXUTM5a2hBbXNReXgxS3JnaUtOYWtZ?oc=5" target="_blank" rel="noopener" title="[숏폼] 알테오젠, 美 약가 규정에 주가 16% 급락">[히트뉴스]</a><a href="https://news.google.com/rss/articles/CBMiV0FVX3lxTE54cXhCSU9mNENGZVM2Q3JUOHA2LXRRUnhTODhfa3plV2tMVnRVQTJMZkdSR1RRUmdJOGdnbG0zSTZweGhWdl9XZldUbzUyNUZjUnBzdV9VYw?oc=5" target="_blank" rel="noopener" title="알테오젠 주가 끌어내린 미국 약가 정책 변경 효과 일시적일까 : 전태연 &#39;피하주사 제형 키트루다&#39; 로열티 감소 대비 불가피">[허프포스트코리아]</a><a href="https://news.google.com/rss/articles/CBMic0FVX3lxTE1zZElWY3ozSEFDLXVqQ2NjWFdKaUFjUjdkckl6dXU4TnFkMFpnYk84a01lajgzcFFNMVl0aTAtbmtrSzlKZ19vVjhuZElaZmY1UHY2ZTdZWmtHci11TzNCSGZDU21SYzlpRWtGS1piUzNIcjQ?oc=5" target="_blank" rel="noopener" title="K피하주사 전환 기술, 美 약가인하에 발목 잡힐까…전망은">[마켓인]</a></span></span></li>
+      <li><span class="tag neu">중립</span><span>약가 악재를 풀 열쇠가 미국 규정상 &#39;바이오시밀러&#39; 해당 여부에 있다는 분석이 나왔습니다. 신한투자증권은 &#39;추가 하락은 과도하다&#39;며 주가가 회복될 것으로 전망했다고 알려졌습니다. <span class="src"><a href="https://news.google.com/rss/articles/CBMihwFBVV95cUxNTEgxQy0xUU1WaXVOS3F4a1k0b2FDQk9nQ25BWVVLbVpsMnVZaUEyX0JGZC1FN0RpTk92anNRWjdqQV9Od0tYVEZwMUlDb0ZkV1BDRWhibm90ZG1sZ0FwN1J4MjFFUlhpdW9pWE54X1h4SWlZUjJ6Zms0azE2aU93LUJTb284RTDSAZsBQVVfeXFMT1Z6MHN0Q1lXTWpsWU5rakdDbV9lRGNGVDY1dmJMXzRUZFVwUlp5bUx3T0Zzd3JHYmRmWjMzTDNydFd2d0ZRR3ZMZTN2eXY2N0VuTWNCVy1IRWZyYmRlNDYweC1yTmVjR205aGtOaGEzYTlfd2E4YmlxLVRtbGdCRHBESzFLc3p4NGJrYlBkN2lCOG5WdGg5bF9HNGs?oc=5" target="_blank" rel="noopener" title="알테오젠 약가 악재, 열쇠는 ‘바이오시밀러’…美 규정 뜯어보니">[Chosunbiz]</a><a href="https://news.google.com/rss/articles/CBMiaEFVX3lxTFBrSGo0aUc0Tk9jMDZIcTRkOVc5aF9rVlhLODJSOWo4R0tnOU40NmdxRmUtVG8wV3NONklTN3N1VTE1Y2RQaGxFaWxDTDQtZU4tYmloVXBFeEJOaGZrWkJkRGZsZzNiMWRi?oc=5" target="_blank" rel="noopener" title="알테오젠 3.01% 상승, 18만1600원…신한투자증권 &#39;추가 하락 과도, 주가 회복 전망&#39;">[CBC뉴스]</a></span></span></li>
+      <li><span class="tag pos">호재</span><span>키트루다SC가 중국에서 19개 적응증(치료 대상 질환) 허가를 받은 지 6주 만에 추가 신청이 이뤄졌다는 보도입니다. <span class="src"><a href="https://news.google.com/rss/articles/CBMickFVX3lxTFBzeTIzMnc5OXoyOUNDVTNPUlZSWlZIYUdXTXk4MnBmcmFXd1lpTWlLUlA0blpiOUJvTlhId3NIclVuVWJuM2NsUFpSLUVENmZSWW1zYWs5aHlUOWZLalZEUWx5MXFoV3VZNjRIVTZza004dw?oc=5" target="_blank" rel="noopener" title="알테오젠 키트루다SC, 中 19개 적응증 허가 6주 만에 추가 신청">[메디코파마]</a></span></span></li>
+      <li><span class="tag pos">호재</span><span>사노피가 알테오젠 기술을 쓴 &#39;듀피젠트SC&#39;의 임상 3상을 시작했다는 보도입니다. <span class="src"><a href="https://news.google.com/rss/articles/CBMiV0FVX3lxTE5VSUNHSzJseW9iV3c2dXJYTFpqN1I4UVZwU2hLM19FZF9rVWZZOTNmVE9hT0prVnFKMGppODVySnQwbWsxTndMeFM0Tm4wOXhPRlFrMVJnWQ?oc=5" target="_blank" rel="noopener" title="사노피, &#34;3상 시작&#34; 알테오젠 기술 &#39;듀피젠트SC&#39; 전략은">[바이오스펙테이터]</a></span></span></li>
+    </ul>
+    <div class="three">
+      <div class="box p"><div class="label">긍정 요인</div><ul><li>분기 매출이 2025년 9월 약 490억 원에서 2026년 3월 약 716억 원, 6월 약 689억 원으로 늘었고, 영업이익도 300억 원대를 유지하고 있습니다.</li><li>키트루다SC의 중국 적응증 확대, 사노피 듀피젠트SC 3상 등 기술을 쓰는 제품이 늘고 있습니다.</li><li>애널리스트 6명의 평균 목표주가는 현재가보다 103.02% 높습니다. 다만 참여한 애널리스트 수가 적습니다.</li></ul></div>
+      <div class="box n"><div class="label">부정 요인</div><ul><li>미국 약가 규정 변경으로 핵심 수입원인 키트루다SC 로열티가 줄 수 있다는 우려가 있습니다.</li><li>주가는 52주 고점보다 58.95% 낮고, 1개월 -21.38%, 3개월 -49.28%로 하락 흐름이 이어지고 있습니다.</li><li>예상 실적 기준 PER이 32.1배로, 이익에 비해 주가가 높게 평가된 편입니다.</li></ul></div>
+      <div class="box w"><div class="label">체크 포인트</div><ul><li>미국 약가 규정의 최종 해석, 특히 피하주사 전환 제품이 &#39;바이오시밀러&#39;로 분류되는지</li><li>키트루다SC 로열티 조건에 실제로 변화가 생기는지, 회사가 어떻게 설명하는지</li><li>다음 분기 매출이 추정치 약 1198억 원에 도달하는지</li></ul></div>
+    </div>
+    <div class="overall"><div class="label">종합 (중장기 관점)</div>피하주사 전환 기술의 적용 범위는 중국 적응증 확대와 사노피 3상처럼 넓어지고 있습니다. 반면 미국 약가 정책이 주요 로열티 수입을 줄일 수 있다는 구조적 불확실성이 생겼습니다. 중장기로는 규정의 최종 해석과 그에 따른 로열티 영향이 기업가치를 판단하는 핵심 변수로 보입니다.</div>
+
+    <div class="fin">
+      <div class="label">최근 분기 실적 (야후 파이낸스 기준)</div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>분기</th><th>2025-09</th><th>2025-12</th><th>2026-03</th><th>2026-06</th></tr></thead>
+        <tbody>
+          <tr><td>매출</td><td>490억</td><td>645억</td><td>716억</td><td>689억</td></tr>
+          <tr><td>영업이익</td><td>267억</td><td>196억</td><td>393억</td><td>342억</td></tr>
+          <tr><td>순이익</td><td>223억</td><td>692억</td><td>717억</td><td>284억</td></tr>
+        </tbody>
+      </table></div>
+      <div class="muted small" style="margin-top:6px">
+        다음 실적 발표: 미정
+ · 다음 분기 매출 예상 1,198억      </div>
+    </div>
+  </div>
+
+  <details>
+    <summary>섹터 종목별 최근 뉴스 제목 보기</summary>
+    <ul class="hl">
+      <li><b>삼성바이오로직스</b><a href="https://news.google.com/rss/articles/CBMiWkFVX3lxTE1XcTNISks2VU4yLV9MSzJQRDJlT1ViVmhJaUVfSUQzN2l6blJRdzhQU2VRVlFramxwMElDZEU5MjlYTWpEdEVNWGZ1ZHpiN05XSkhTbDFsSnAwQQ?oc=5" target="_blank" rel="noopener">삼성바이오로직스, 2조6650억 원 유상증자 청약률 96.8% 기록</a>
+        <span class="muted small">위클리피플 인물지식가이드저널 11/12 09:42</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMiYEFVX3lxTFBRMXBTQjdSMUJaYmFVNlYySDJTTXlnMm9udnhHRThJVG5IVE9IZWNTZXhNUGN5c1o5VzFrZTlMend4azB2aGllMENPdXFVZ25tajdLQVV5c25lOGNNdHdGVA?oc=5" target="_blank" rel="noopener">삼성바이오로직스, 2.7조 유상증자 청약률 96.8%</a>
+        <span class="muted small">뉴스1 11/12 08:30</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMiaEFVX3lxTE5VcEpzdXl2NDh5U04tcjVqY3U2d1o0MXVSZUphNXc3cGtqeTFSUXFFQ3dLaFdIRFBTQ3dPLUJ4bkxGMDJKTTZwOG5OUjlRaUxOSDBvMXppSVBJeThGNEZUZlFSMkpycVM2?oc=5" target="_blank" rel="noopener">동아제약·삼성바이오·HK이노엔·SK케미칼 ‘A+’</a>
+        <span class="muted small">데일리메디 11/12 06:41</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMic0FVX3lxTE9ZUmdWVVRrRThpcjVISGpaVUIwMXFYSVNROUc5bFNDdk5mWVFURmxTM3hocndUckh5SnlUaThuRmlJa1ItNHJZbnU0SGVha3RXanFBcmZDVTRvWVMwY28tZHhqU3gxdXhZSU9kZmpRWF84Q3PSAXZBVV95cUxNMktRblB2ZkI5T2dESDBxM1cwc3hRMlZsWm5Zb0I4OF9hTkxwY0NVNXBWRXFuS3BDb29aTUlKWG92Mm9PTC1WU19qMVNtRlA2VnZKYlpnRFEtcGJ6Y0xlMnZWVFZuSDF0bzhnclg4UFlMd1FaUmJ3?oc=5" target="_blank" rel="noopener">K-바이오, 영업이익률 &#39;최대 45%&#39; 벽 넘어...전통제약사 &#39;압도&#39;</a>
+        <span class="muted small">메디소비자뉴스 11/12 06:12</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMiaEFVX3lxTE1MOV8wLXQwWkZuNjJwT2ZPcDdpeV9Obk5ZQXg1MHIzR2ZnWDRVSjM5akJZR3Rmd2IzdTFZSnVsVHVKbHhTb1lGVFpiSFFPbndQaW54SHdmYmY3ZEVzREQ0UEN3ZWo3bF9H?oc=5" target="_blank" rel="noopener">삼성 4.9조·롯데 1.5조…&#39;금수저 바이오&#39;의 든든한 모기업 지원</a>
+        <span class="muted small">메디팜스투데이 11/12 06:00</span></li>
+      <li><b>셀트리온</b><a href="https://news.google.com/rss/articles/CBMicEFVX3lxTFBUN2o3NHFhSERKQ1N6Rmxmd0ozNWJ0LUdZaC1RckNMdUpTRkl0MkhJWlZHNWhuSWhEblJTMVViNVVfemloOHNRaERZUmRZZFYtMEZYQWdHRVVaOFlURENVWnNZUHhhbjJELUt1Q25BdTE?oc=5" target="_blank" rel="noopener">셀트리온, 자가면역질환 바이오시밀러 해외 공략 확대</a>
+        <span class="muted small">Korea IT Times 11/12 10:45</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMiY0FVX3lxTE5GbzlrdF90YzJBanc0SUVNTnd0QndZb2FHVUNPeV9oWmxoMDRUWFhwS3FGLUZMZUcyam5DQTRWdVFJZ0RqaWYySUROSnMtdm95eVpHeUY0X0stRERyUGd3czROMA?oc=5" target="_blank" rel="noopener">셀트리온, 코센틱스 바이오시밀러 ‘비세큐마’ 호주 허가 신청</a>
+        <span class="muted small">쿠키메디 11/12 10:41</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMibkFVX3lxTFAxQzlFR0lnU0dFVW5CN0JWbFJvSU5ZNnpNeFpyc3Nuc2NNR3hkaFRTalE2OE5JV3VteUJhN3h1Yk03cWpab3hqejdHUjZnQVRzSGtyUTI1S0p5R21JSnhxTHB2VnItUldkQXN5UG13?oc=5" target="_blank" rel="noopener">[BioS]셀트리온제약, KCGS ESG 평가서 &#34;통합 A등급 획득&#34;</a>
+        <span class="muted small">이투데이 11/12 10:35</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMia0FVX3lxTE45WlRGR0t0OXJVRWJmX05UVUs5emRSN0lYV28xU2RWY1FpbDMtcW5FY1I4WXpnVXZUX3hLTW5LdUs4bmxjaXV4a2owWnE0dTF5QkYtYTNYOGVRV3BNODB4YmJmVzRHMnZBS0pr?oc=5" target="_blank" rel="noopener">셀트리온, &#39;비세큐마&#39; 오세아니아 시장 진출…9.3조 글로벌 시장 공략</a>
+        <span class="muted small">뉴스저널리즘 11/12 10:34</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMibEFVX3lxTE1MVkZ3M3BiS3hwcnZxSzFZckZxVkJibGsxZENZenVQZ0luMF9ZU2pSUnV4SWtuS0daUzZXZzVoRjVOSlJLd0x5eHE1VkdXYUFBMHFGa3pqZUV2eC1kM3RWSTN4dFBxMkNSakhMSg?oc=5" target="_blank" rel="noopener">셀트리온, 자가면역질환 치료제 ‘비세큐마’ 호주 허가 신청</a>
+        <span class="muted small">바이오타임즈 11/12 10:33</span></li>
+      <li><b>알테오젠</b><a href="https://news.google.com/rss/articles/CBMiXEFVX3lxTE1hOW5TVHJVeWlNdHdnNXF3U2ZVVFRnLXlmVEN4U0d6WldZallTWmFxbVZRZ0tiRnJlYUViRmJWUmd4dzAxOXEzUFozbnBNTnQ5aFJVNmJYZmEyblhV?oc=5" target="_blank" rel="noopener">알테오젠 주가 하락 중</a>
+        <span class="muted small">아시아뉴스통신 11/12 09:28</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMickFVX3lxTFBzeTIzMnc5OXoyOUNDVTNPUlZSWlZIYUdXTXk4MnBmcmFXd1lpTWlLUlA0blpiOUJvTlhId3NIclVuVWJuM2NsUFpSLUVENmZSWW1zYWs5aHlUOWZLalZEUWx5MXFoV3VZNjRIVTZza004dw?oc=5" target="_blank" rel="noopener">알테오젠 키트루다SC, 中 19개 적응증 허가 6주 만에 추가 신청</a>
+        <span class="muted small">메디코파마 11/12 08:36</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMihwFBVV95cUxNTEgxQy0xUU1WaXVOS3F4a1k0b2FDQk9nQ25BWVVLbVpsMnVZaUEyX0JGZC1FN0RpTk92anNRWjdqQV9Od0tYVEZwMUlDb0ZkV1BDRWhibm90ZG1sZ0FwN1J4MjFFUlhpdW9pWE54X1h4SWlZUjJ6Zms0azE2aU93LUJTb284RTDSAZsBQVVfeXFMT1Z6MHN0Q1lXTWpsWU5rakdDbV9lRGNGVDY1dmJMXzRUZFVwUlp5bUx3T0Zzd3JHYmRmWjMzTDNydFd2d0ZRR3ZMZTN2eXY2N0VuTWNCVy1IRWZyYmRlNDYweC1yTmVjR205aGtOaGEzYTlfd2E4YmlxLVRtbGdCRHBESzFLc3p4NGJrYlBkN2lCOG5WdGg5bF9HNGs?oc=5" target="_blank" rel="noopener">알테오젠 약가 악재, 열쇠는 ‘바이오시밀러’…美 규정 뜯어보니</a>
+        <span class="muted small">Chosunbiz 11/12 07:15</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMic0FVX3lxTE1zZElWY3ozSEFDLXVqQ2NjWFdKaUFjUjdkckl6dXU4TnFkMFpnYk84a01lajgzcFFNMVl0aTAtbmtrSzlKZ19vVjhuZElaZmY1UHY2ZTdZWmtHci11TzNCSGZDU21SYzlpRWtGS1piUzNIcjQ?oc=5" target="_blank" rel="noopener">K피하주사 전환 기술, 美 약가인하에 발목 잡힐까…전망은</a>
+        <span class="muted small">마켓인 11/12 07:01</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMidEFVX3lxTE83MDJvS1NJdEJEeEl3bnZiV1lNaEJFbVVRY011TE5MNnh3aFBUd0h0OVJfRi1WbUt4dmRqc2FnaDNZNGhwRDhyb3gtTGJNcW0xNWNhQjQ3blR3bUhDMU5RYV96THR0bDcyRkNlZW1LY1dla0p2?oc=5" target="_blank" rel="noopener">알테오젠 주가 7,200원 상승 후 장마감</a>
+        <span class="muted small">아시아뉴스통신 11/11 15:54</span></li>
+      <li><b>SK바이오팜</b><a href="https://news.google.com/rss/articles/CBMigAFBVV95cUxPb2FwUFZzaFpBc1gxblFfLWp5dlUwQXlpT0g4UXZZMXJWVDA3WVlrb2FTTFJnekduVGFMWFNJN3B1OE9PbzNKbGtRMzBBX0p5bFlJejBxTTZLX0stMkdfNE5Bd0ZPcmtQVWdQUHplV1IyRWVCakRkZ2FJdjNIMHF6NQ?oc=5" target="_blank" rel="noopener">SK바이오팜 오파칼림 임상 보류 길어지나…美 바이오헤이븐 “자료 준비 중”</a>
+        <span class="muted small">이데일리 11/12 08:02</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMibkFVX3lxTE9HeG5WMEZhQzZVb09EQ2l1Q1JzTV9lSm5sd085WDJ1MWZKYVZ0TXkyakN0cjF0bTYwaUUzX2FWenJpTFFuVUxjc1BNRHNnaUJoRXpWcDVMNUNsWTlrNEdDUVF6Zzg1TWkzcDZ6bk5B?oc=5" target="_blank" rel="noopener">SK바이오팜 ‘세노바메이트’ 소아·청소년 적응증 확대, 유럽서 제동...왜?</a>
+        <span class="muted small">팜이데일리 11/12 07:30</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMickFVX3lxTE1MdThjMDlSNjhTdWxGOTlxQnFPRzNvSFJWTXdvTmp4eDUyOUhsYlJacThDSV9PVlVPZW0wUl90ajkzYmZTZjNhT05vZDNDOGM4NWk5NTZ6RzQ0dlNISktQMkZ0VDN4dzh6QUJnemdJUzlfdw?oc=5" target="_blank" rel="noopener">SK바이오팜 &#39;솔리암페톨&#39; 적응증 확대 속도…美 4개 3상 진행, 中도 신청</a>
+        <span class="muted small">메디코파마 11/12 07:15</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMickFVX3lxTE5lLTItcDVhYzlSYjFoN2dMUzIxMXEyWTdvaDJmR1ZMYjVrRjFaUXlWZ191NjE1Y2gtUk02MldROEZWWUVzQ2FCNHh0clM3TXlnRTNRdHFISGlpc2NQMUVQUlNmbjhKREJHSk1NeVhPc0JrQQ?oc=5" target="_blank" rel="noopener">SK바이오팜, 구글과 신약개발 AI 경쟁…특화 모델 성능은</a>
+        <span class="muted small">중앙이코노미뉴스 11/11 14:05</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMiaEFVX3lxTE5ZX0pVUHFyX0hMbGlRZWlFUkNDbS1fMFhfckRzMld0Y1hqemM1MFp4Wk5oeU1mc2dUZjRHMmEteXNMdktHNHRQME9xNzdrWnFDbHN5eUFTYWM3TFIyeXkzcjM4OGFvYXp2?oc=5" target="_blank" rel="noopener">SK바이오팜, 뇌전증 치료제 ‘세노바</a>
+        <span class="muted small">이투데이 11/11 09:05</span></li>
+      <li><b>한미약품</b><a href="https://news.google.com/rss/articles/CBMiWkFVX3lxTE0wVHVsa3NKa1otcml2VDlYZGVNeTRsSm9LbnhJS193bWpKS1VKN2FFYnlJTnRNWVBCZTROdUlocGowTXlLbDV4c0I0WnFYWl9sY1NFMDljbXhxdw?oc=5" target="_blank" rel="noopener">&#34;가격 경쟁력 사라지나&#34; 한미약품, 해외 비만약 반입 허용에 7.27% 급락</a>
+        <span class="muted small">한국경제 11/12 09:42</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMiV0FVX3lxTE9JUTBxVk1qQ0pLOE9jQmxLa2hxQzF3a3ZpbmhnaU53S0lFQkRHamxNcVVST2JtZzd6clBxRHZxcXliS2NxU0ZZQ1FiM2xaU2VZSk1WWXJYWQ?oc=5" target="_blank" rel="noopener">한미약품, 근육보존 &#39;마이오스타틴 저해제&#39; 다른 이유?</a>
+        <span class="muted small">바이오스펙테이터 11/12 06:04</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMiakFVX3lxTE1yT3VOZ3RSMUMzOGVCLXRjOTk3alIySVNqb1ZXc0ZmTEk4c2ZCYjVlSURMWXd3YXBySzF4Nm1yZkhhS09KRWNUbFV0QmthV0U5OGhrX1lkNDNhV3VBbjNCcHVyRGFlX3VrTWc?oc=5" target="_blank" rel="noopener">아젤라산 성분 여드름 치료제 일동·경남제약 가세</a>
+        <span class="muted small">의학신문 11/12 06:00</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMijwFBVV95cUxNbm1fOGx6QXZNaUZHaFI5dHoybFRYTnB3a2tOTl9WUHBkWGNmOFFyeFV6QXpWOTFNNzRCVXBMTVpCTmxKQ0hFRUFjN21BR1huc2g1WFlnQWJHRlRTdGtWSWxDa2NPZHZKYWE0VUNteWMtVGVNTDNleVRMVHNacEVUeVdWU1BieXhlS1RyV184UQ?oc=5" target="_blank" rel="noopener">한미약품 기술이전 MASH 신약, 2b상서 1차 평가지표 충족 : 네이버 블로그</a>
+        <span class="muted small">Naver Blog 11/11 23:13</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMiZ0FVX3lxTE9QVlZ6emR2dWg5ZDVFZ0g0ZHgxM1VFM01VNGRIME5INlVNSnFJTXp5Tjlqc1k1X3pGR2d6eE9KQVlVWVlJLU1GNUNxTDZ0NzRDMUh1WlpLLVF6RlNqaUxCWXpvM1ZTbHM?oc=5" target="_blank" rel="noopener">한미약품, ‘에독스반정’ 출시…항응고제 포트폴리오 확대</a>
+        <span class="muted small">메드월드뉴스 11/11 21:50</span></li>
+      <li><b>유한양행</b><a href="https://news.google.com/rss/articles/CBMiUkFVX3lxTE95UFRHbzhsTGkxUlFzT0ZuZ3hqenlPcWw3M18tSUZyZkp5aUdIUUUzWjYyeDFwTjh6bFk0MWhRbUJ3SjdjYjBFWnNGNThWT3JDWWc?oc=5" target="_blank" rel="noopener">당뇨병 조기 관리 중요성 알린다..유한양행·한국베링거인겔하임 캠페인</a>
+        <span class="muted small">한국정경신문 11/12 10:10</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMiZEFVX3lxTE80a1JEZ1hfU0cwVmlaQUtUZ3dpcXBPRHhmdmRsdTNpTzQ2NXBfVzIwczUzckQ3bTZlZHJwWU51Wi0tbVBhX0diX19zZWJiejU5VVhab0JmZHpIM1ZjYmowY3pqTTk?oc=5" target="_blank" rel="noopener">유한양행·한국베링거인겔하임, 세계 당뇨병의 날 맞아 환자 응원</a>
+        <span class="muted small">인더뉴스 11/12 10:00</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMib0FVX3lxTE5UR0N1SktiakdodDNGa2lwZy15UUlFYlh1U1pjQlBHc1NuQUtXYnNUV0lNT0ZyMVljbmVwQk9iUUZDa2pXN1RhRnQwZ2V6d3JhV21zcE9menZicEQ4MkV2SWFSMklsSnBnSUVHMi1jbw?oc=5" target="_blank" rel="noopener">유한양행·베링거인겔하임, 당뇨병 환자 응원…&#39;블루 트리&#39; 캠페인</a>
+        <span class="muted small">뉴스퀘스트 11/12 09:53</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMiREFVX3lxTE5Wbmxqb0R2WlVTeEtDYUFZZnlBNldDeTlJOVpUQWpIM0V6UVhVLVdLR0hkVmZkTl8yeElWallMT0h1dkFl?oc=5" target="_blank" rel="noopener">한국베링거인겔하임·유한양행, 당뇨병 환자 응원 캠페인</a>
+        <span class="muted small">후생신보 11/12 09:51</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMiYEFVX3lxTE8yeGg1V2psN3pHSXY3dElOSHhQT2FMOEY2MjBwNVRiRzhKb2VHZkZrMDdaTkZJcWZtZmJjZW8xcEIyNGRZOFl4aTV4RjgydmpsWXdkYnR0Z2g5bzJRa3hFTw?oc=5" target="_blank" rel="noopener">유한양행·한국베링거인겔하임, &#39;당뇨병의 날&#39; 맞아 환자 응원</a>
+        <span class="muted small">뉴스1 11/12 09:42</span></li>
+      <li><b>삼천당제약</b><a href="https://news.google.com/rss/articles/CBMiaEFVX3lxTE9KZnB0X1BpMjJhbXNrY3pjNDVjUWhXQ0lOeV8wT3pucjVDcndiTG5IcHhNUDZRbUt2MG5PNzRycGZSaWcxeEdyX3BTQ3JsdEJoUGx3MkNxak9PeWNlR29pbXBtdXJwS1Qw0gFuQVVfeXFMTkhLSEtWZUlVa2pxMFRZZ0gxLVRjTnRkY0FyRXBhaEZjaHNpYVByamhjMThOOUVzRVA5cnBVbE5LRXFkazR0Q0ZvNnFDR2hkZW90dk5RZzBrbjl2UktPdmIyWjYwMW9uc0Qydzk1MFE?oc=5" target="_blank" rel="noopener">&#34;연저점은 너무했지&#34; 코스닥 연이틀 급등…700 문턱 - 머니투데이</a>
+        <span class="muted small">머니투데이 11/12 10:36</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMiaEFVX3lxTFBDcUtqY0JEZjF6NThTZnFBT2NpSVBkQXdEdDJvT3k0VElxZDFyRmdxVVZnMlQ4b0xaOFR6TVpVVmkzNjJSa3FnanIyN3lmLU1kOEt3ZS12R2RndjZob0lubzJ0ZnV4UGR5?oc=5" target="_blank" rel="noopener">삼천당제약 0.38% 강보합…주식시장 변동성 확대 속 주가 향방 촉각</a>
+        <span class="muted small">CBC뉴스 11/12 09:34</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMiREFVX3lxTFA0LXZjSjZrSHpOMWFmQ1VqN2YzY0lFTWJKZ3l0SnFMYm5rYzhmRFQ4NVZSbFp4dTFNdlNfUm9fUEcxY1RU?oc=5" target="_blank" rel="noopener">ESG 저평가, 제일·동화·현대약품 `C`‥삼천당·이연·일양·일성 `D`</a>
+        <span class="muted small">뉴스맥 11/12 07:11</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMiaEFVX3lxTE5VcEpzdXl2NDh5U04tcjVqY3U2d1o0MXVSZUphNXc3cGtqeTFSUXFFQ3dLaFdIRFBTQ3dPLUJ4bkxGMDJKTTZwOG5OUjlRaUxOSDBvMXppSVBJeThGNEZUZlFSMkpycVM2?oc=5" target="_blank" rel="noopener">동아제약·삼성바이오·HK이노엔·SK케미칼 ‘A+’</a>
+        <span class="muted small">데일리메디 11/12 06:41</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMibkFVX3lxTFBiMVMwWmdNTFRUalBqdVRKSmJndUQ4Q3Z4WnR6bGZQLXE1QlFpcGxqSzVWWW5GbW1PclU5LU5oS25icmJmWGpXSHN0MG9NWWpHdU5DWmhhb05GTjhiNkU0amhGMlpNQ2NOQlV6MHBn?oc=5" target="_blank" rel="noopener">코스닥, 5%대 급등에 700선 회복...에코프로, 에코프로비엠 상승</a>
+        <span class="muted small">이코노뉴스 11/11 21:30</span></li>
+      <li><b>HLB</b><a href="https://news.google.com/rss/articles/CBMiYEFVX3lxTE9HTWZRZlI4Q1B3czNrMnVJRVpaSG03aUcyRHlYZ1B4U0x4aGNkLUo4WDM2YWFrT2t2UGszRVNXZ0hBTmY0OUo3U2V2UEcwQVZEdTAxWDZXMmtkT0dUWWRQUg?oc=5" target="_blank" rel="noopener">HLB제약, 향남에 &#39;550억 신공장&#39; 첫 삽…생산능력 3배 키운다</a>
+        <span class="muted small">뉴스1 11/12 10:48</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMiaEFVX3lxTFBxTzdGa1ZZU2NPYUZ4TmJxSkpaMUdBSUVBakh0S25PV1hZbnBzY2NlWXpmTDUtRkc3ZHJMX2tsSXlaY3YzQm9RTExGNzgwUzloM3BPbHBYT00xUDZoZmVhaGhpRGRnS2dX0gFuQVVfeXFMT3JNNC1BbGlaZ1N5Q0V0MWVlY294WUVwcGNucjhtZlctMG95Y1E4emFHYTJLa2JEWE1NYXdKdWtsclY0RGp3NExlNFRWV3lBUHp5cUpBb29HTjFpbmJPSFpwVzdXZXo0Yk1kblJ4d2c?oc=5" target="_blank" rel="noopener">진양곤 HLB 의장 &#34;두 번째 항암신약 허가 확신… 향남공장 글로벌 생산기지 육성&#34; - 머니투데이</a>
+        <span class="muted small">머니투데이 11/12 10:35</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMieEFVX3lxTE5SOFczeG50cUppVUJINkRHNnQ4YjFnZXpKc2NSVXJXTHhaaDlfNTk4aXFCVlVvTVJreFFLODBJcVJ4YlVJS3Ewdjg2dkt1SnlfMHdFWWxrLUh0UzFfRXZOVjBFdFR2LV9fUmNSd1ptd3VTZmcwRGpIUg?oc=5" target="_blank" rel="noopener">HLB파나진, HPV 분자진단 제품 멕시코 품목허가 획득</a>
+        <span class="muted small">로이슈 11/11 18:52</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMickFVX3lxTE9QYW1zQjNzMnhTVmp4cjRPel9oX0ZmTDk2OHNvd0FkMmFiVloyZS1TMWFnNzJIa2xMN3NhdUdGYlp5V0E2R19jcHBTQnZtbDBiZTN0STNXeFBSNmE2eWJrbnpRVzV6ZERKR0FRSnVwLTU3dw?oc=5" target="_blank" rel="noopener">HLB파나진, 3분기 영업손실 1억으로 축소…멕시코 진단제품 허가 확보</a>
+        <span class="muted small">메디코파마 11/11 18:39</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMibEFVX3lxTE1vSy1rNlFZYWpJbXhYbl8tWnBrdUEyWTFMbU1TVDBsUGRvOXdidG5nVF9FODFPQ3E0TXduLUpIOFlsSE9neldPSVRXaHZBQW42cXJyVlRlVHRFY3pkSWVPYXRRWk1VMi0xdUtnYg?oc=5" target="_blank" rel="noopener">해명 나선 HLB…간암 신약 허가까지 넘어야 할 관문</a>
+        <span class="muted small">프라임경제 11/11 17:24</span></li>
+      <li><b>SK바이오사이언스</b><a href="https://news.google.com/rss/articles/CBMic0FVX3lxTE1oSW5iemNsdDlJTVFJV2FDMEpYYmRMREgxU2VQeE9HZkFOVWp0Q3Rja2ltVVE0dS04QldfdzNYZ2NFRGFCWDdZekRraDdSTEVScGVyYV9IRXNaVC1wa0Nzb0RPVm1DZzdqMUdDekhqUll5MU3SAXNBVV95cUxNaEluYnpjbHQ5SU1RSVdhQzBKWGJkTERIMVNlUHhPR2ZBTlVqdEN0Y2tpbVVRNHUtOEJXX3czWGdjRURhQlg3WXpEa2g3UkxFUnBlcmFfSEVzWlQtcGtDc29ET1ZtQ2c3ajFHQ3pIalJZeTFN?oc=5" target="_blank" rel="noopener">SK바이오사이언스, 한국ESG기준원 2026년 평가 &#39;통합 A&#39;</a>
+        <span class="muted small">데일리한국 11/12 05:14</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMiaEFVX3lxTE9WUmIzRURVc0xibnRwN1V2YU5WRHhuSzNlZnJJNEt1ZmhFbTR3dDAyQ0dtUkxMQWNQamJlYWxvUTFCM2FwZUhpSEw2cTRnemVEMXo4cUJKallybjB6M0s3aDJVcjRiYWxr?oc=5" target="_blank" rel="noopener">SK바이오사이언스, ESG 평가 5년 연속 통합 A등급 획득...&#39;환경 부문 상향&#39;</a>
+        <span class="muted small">팍스경제TV 11/11 22:11</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMia0FVX3lxTE1lODdCMTZQNWRaTWt1X09Id3hJSEg0b0VZOWlxX2xvTFJPbkREM1BFNUFhZ2Mwb1dEc1VRbk9qZ2VtN3hhaGZpWmMwemY2UWVDQU04UDNYNHFzNWdsOWl4LTJlUk1sR1VLMG5v0gFrQVVfeXFMTWU4N0IxNlA1ZFpNa3VfT0h3eElISDRvRVk5aXFfbG9MUk9uREQzUEU1QWFnYzBvV0RzVVFuT2pnZW03eGFoZmlaYzB6ZjZRZUNBTThQM1g0cXM1Z2w5aXgtMmVSTWxHVUswbm8?oc=5" target="_blank" rel="noopener">SK바이오사이언스, ESG 평가 5년 연속 통합 A등급</a>
+        <span class="muted small">현대경제신문 11/11 19:43</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMiekFVX3lxTE9lSTd5dmtnRVJ6aHdxd3ZXVWZZTEJRZFFjTTZ4ZU1LRHVXb01jN1pnV0lYYzZ3MW90OE5RNkdkYzNHSkVfQmhlQngzT3FmWFRrT2lfNnRaOGlBQ0ZTT3Q3MVJyaWIyX3NJMEVuVDRibE9neHNidGlubVdB?oc=5" target="_blank" rel="noopener">SK바이오사이언스, KCGS ESG 평가 5년 연속 통합 A등급 획득</a>
+        <span class="muted small">로이슈 11/11 18:36</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMidkFVX3lxTFBoVTVROUxpQ1lNRVppbXZVQktkMUFxQUQwdEJrOXJFUDZ3OFIyVE05TUJOTHJDTzFYOEk0WnZFM0ZxMXZFSGFoTmVTSXA2cFZWRnhUbEZmTW5MWDJxZjVJV1VBNTF4SkNyQmhyYjFUbU9JN1plN2fSAWZBVV95cUxQdmlWbnJ5RjNUTl9Ic0JCaVdDR1I5V29PU2pNQU9ZbEdSNFhYVkhlVGJlMzdaTkhfRG03cnBkY2VOc2NqUy1sR3RqQkN6OEdKdlM5R1Z2TlNXVk9OVm5HZG5SUW9CV3c?oc=5" target="_blank" rel="noopener">SK바이오사이언스, 증시 조정 속 주가 상승… 실적 개선 주목</a>
+        <span class="muted small">동아일보 11/11 18:17</span></li>
+      <li><b>파마리서치</b><a href="https://news.google.com/rss/articles/CBMiWkFVX3lxTE5mRWFlaWtxUjVoNjA0Qi1IR0VuZE9qSVZWcTBXM3AzRlZkZWw1OUtZdVE3MlpiYVZ3ZktpbjR3RkxKRHpnSjBsZjVrczlqMkhJRGdOb29CaEY0QQ?oc=5" target="_blank" rel="noopener">“파마리서치, 주가 바닥 지났다…목표가 42만원”</a>
+        <span class="muted small">한국경제 11/12 10:30</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMia0FVX3lxTFB2WGE4Nkk2cU1JWkZyM0NfMTYtZHZNV0pHem5zY1l3b08tejM2ZGdMcENYQmVfcTItLWJCWFpwYTBhV3BwOVJDMjdzWm53UlZCNHQzOWdBV0hDVjVOaXItcjI0azRNWE5tMHc4?oc=5" target="_blank" rel="noopener">파마리서치문화재단, 2026 메세나대상 &#39;문화공헌상&#39; 수상</a>
+        <span class="muted small">마일드경제 11/11 19:33</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMiZ0FVX3lxTFByNkxjbHFFVjQtX3h3ZGJSZF84N1QyLXhfSWx5S21tMW9lM29tMElyanNhZWdnVTNkR1VZbEFOSGpNU2s0c1JjeTRDbUZqU0xLY3ZpdkV0anRveXBJUE1kOVRic2RCVFk?oc=5" target="_blank" rel="noopener">파마리서치문화재단, 2026 메세나대상 ‘문화공헌상’ 수상</a>
+        <span class="muted small">강원도민일보 11/11 17:50</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMidEFVX3lxTE9KUFZUUHZ6UHBoaDlJbDBkN01oSjRpN2xQNWhKZUJ4ZFEzMG53elQ1MWRqbDFWVEphVlNpb2lnREQ1SGh4ak5YSVZtOC1QNVc1MVFKRFh5bnhjTThOd2dmTWNzbW5ENEtmb3BuVUU2cm0xYVN50gF0QVVfeXFMT0pQVlRQdnpQcGhoOUlsMGQ3TWhKNGk3bFA1aEplQnhkUTMwbnd6VDUxZGpsMVZUSmFWU2lvaWdERDVIaHhqTlhJVm04LVA1VzUxUUpEWHlueGNNOE53Z2ZNY3NtbkQ0S2ZvcG5VRTZybTFhU3k?oc=5" target="_blank" rel="noopener">파마리서치문화재단, 강릉 예술 지원으로 문화공헌상 수상</a>
+        <span class="muted small">주간한국 11/11 16:00</span></li>
+      <li><b></b><a href="https://news.google.com/rss/articles/CBMiakFVX3lxTFBjXzNJNXRJWUdBbHdYc0FuSkdUTzYxZFNVT0dla0ZVQU90VUEtMWdFdUhNdTAwSW1MMW5MajBYMXduMzJwbnhZM0U4NHFxcmZfbjlCcDRDczlfSTRhT1FxWUVMUkw3X0VxMXc?oc=5" target="_blank" rel="noopener">파마리서치문화재단, 2026 메세나대상 &#39;문화공헌상&#39; 수상</a>
+        <span class="muted small">월요신문 11/11 15:31</span></li>
+    </ul>
+  </details>
+</section>
+<section id="us_it">
+  <h2>미국 · IT (정보기술)</h2>
+<div class="card"><div class="label">섹터 요약</div>11월 11일 미국 IT 섹터는 크게 반등했습니다. AI 클라우드 기업 코어위브의 3분기 실적이 예상보다 좋자 AI 관련 투자 심리가 살아났다는 분석이 나왔고, 마이크론 +11.89%, 오라클 +8.82%, AMD +7.32%, 어플라이드 머티리얼즈 +6.05%가 올랐습니다. 반면 마이크로소프트는 -2.26%로 약했습니다. 장이 끝난 뒤에는 엔비디아 이사회가 젠슨 황 CEO 교체를 검토한다는 보도가 나왔고, 엔비디아가 시간외 거래에서 약 8% 떨어지면서 섹터 분위기가 다시 흔들릴 수 있다는 우려도 함께 나왔습니다.</div>
+  <div class="table-wrap">
+  <table>
+    <thead><tr>
+      <th>종목 (시가총액순)</th><th>현재가</th><th>1일</th><th>1주</th><th>1개월</th><th>3개월</th>
+      <th>거래량<br>(20일 평균 대비)</th><th>52주 고점 대비</th><th>시가총액</th><th>예상 PER</th>
+      <th>목표가 괴리</th><th>애널리스트</th>
+    </tr></thead>
+    <tbody>
+    <tr class="deep">
+      <td>애플<span class="sym">AAPL</span></td>
+      <td>$355.63</td>
+      <td class="up">+2.0%</td>
+      <td class="up">+1.8%</td>
+      <td class="up">+4.2%</td>
+      <td class="up">+16.5%</td>
+      <td>0.7배</td>
+      <td class="flat">+0.0%</td>
+      <td>$5.17T</td>
+      <td>33.7</td>
+      <td class="down">-3.1%</td>
+      <td>매수 <span class="muted">(40명)</span></td>
+    </tr>
+    <tr class="">
+      <td>엔비디아<span class="sym">NVDA</span></td>
+      <td>$173.73</td>
+      <td class="up">+2.9%</td>
+      <td class="down">-13.2%</td>
+      <td class="down">-24.0%</td>
+      <td class="down">-22.9%</td>
+      <td>1.8배</td>
+      <td class="down">-27.4%</td>
+      <td>$4.20T</td>
+      <td>10.9</td>
+      <td class="up">+84.2%</td>
+      <td>강력매수 <span class="muted">(57명)</span></td>
+    </tr>
+    <tr class="">
+      <td>마이크로소프트<span class="sym">MSFT</span></td>
+      <td>$521.12</td>
+      <td class="down">-2.3%</td>
+      <td class="down">-6.2%</td>
+      <td class="down">-4.1%</td>
+      <td class="up">+4.9%</td>
+      <td>1.1배</td>
+      <td class="down">-6.2%</td>
+      <td>$3.87T</td>
+      <td>21.5</td>
+      <td class="up">+22.1%</td>
+      <td>강력매수 <span class="muted">(54명)</span></td>
+    </tr>
+    <tr class="">
+      <td>브로드컴<span class="sym">AVGO</span></td>
+      <td>$345.22</td>
+      <td class="up">+4.0%</td>
+      <td class="up">+6.1%</td>
+      <td class="down">-3.4%</td>
+      <td class="down">-17.4%</td>
+      <td>1.3배</td>
+      <td class="down">-28.3%</td>
+      <td>$1.65T</td>
+      <td>17.7</td>
+      <td class="up">+54.5%</td>
+      <td>강력매수 <span class="muted">(47명)</span></td>
+    </tr>
+    <tr class="deep">
+      <td>마이크론<span class="sym">MU</span></td>
+      <td>$811.30</td>
+      <td class="up">+11.9%</td>
+      <td class="up">+2.0%</td>
+      <td class="down">-14.9%</td>
+      <td class="down">-14.6%</td>
+      <td>1.1배</td>
+      <td class="down">-33.1%</td>
+      <td>$917.9B</td>
+      <td>3.9</td>
+      <td class="up">+92.5%</td>
+      <td>강력매수 <span class="muted">(45명)</span></td>
+    </tr>
+    <tr class="">
+      <td>AMD<span class="sym">AMD</span></td>
+      <td>$552.90</td>
+      <td class="up">+7.3%</td>
+      <td class="up">+13.1%</td>
+      <td class="down">-8.7%</td>
+      <td class="up">+14.5%</td>
+      <td>1.4배</td>
+      <td class="down">-14.9%</td>
+      <td>$906.8B</td>
+      <td>31.3</td>
+      <td class="up">+18.9%</td>
+      <td>강력매수 <span class="muted">(48명)</span></td>
+    </tr>
+    <tr class="">
+      <td>팔란티어<span class="sym">PLTR</span></td>
+      <td>$172.40</td>
+      <td class="up">+2.1%</td>
+      <td class="up">+0.4%</td>
+      <td class="down">-17.4%</td>
+      <td class="down">-3.7%</td>
+      <td>0.6배</td>
+      <td class="down">-17.5%</td>
+      <td>$415.4B</td>
+      <td>67.9</td>
+      <td class="up">+28.9%</td>
+      <td>매수 <span class="muted">(28명)</span></td>
+    </tr>
+    <tr class="deep">
+      <td>오라클<span class="sym">ORCL</span></td>
+      <td>$128.38</td>
+      <td class="up">+8.8%</td>
+      <td class="up">+3.8%</td>
+      <td class="down">-10.3%</td>
+      <td class="down">-17.8%</td>
+      <td>0.9배</td>
+      <td class="down">-48.3%</td>
+      <td>$400.3B</td>
+      <td>11.6</td>
+      <td class="up">+84.0%</td>
+      <td>강력매수 <span class="muted">(40명)</span></td>
+    </tr>
+    <tr class="">
+      <td>시스코<span class="sym">CSCO</span></td>
+      <td>$100.76</td>
+      <td class="up">+2.7%</td>
+      <td class="down">-2.8%</td>
+      <td class="down">-12.4%</td>
+      <td class="down">-11.2%</td>
+      <td>1.0배</td>
+      <td class="down">-22.5%</td>
+      <td>$397.3B</td>
+      <td>17.9</td>
+      <td class="up">+34.8%</td>
+      <td>매수 <span class="muted">(24명)</span></td>
+    </tr>
+    <tr class="">
+      <td>어플라이드 머티리얼즈<span class="sym">AMAT</span></td>
+      <td>$395.08</td>
+      <td class="up">+6.1%</td>
+      <td class="up">+7.0%</td>
+      <td class="down">-14.9%</td>
+      <td class="down">-26.1%</td>
+      <td>0.9배</td>
+      <td class="down">-45.4%</td>
+      <td>$313.5B</td>
+      <td>21.2</td>
+      <td class="up">+57.1%</td>
+      <td>강력매수 <span class="muted">(37명)</span></td>
+    </tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="muted small" style="margin-top:6px">
+    기준일 2026-11-11
+종가    · 예상 PER = 주가 ÷ 향후 12개월 예상 주당순이익 · 목표가 괴리 = 애널리스트 평균 목표가와 현재가 차이
+  </div>
+
+  <div class="card deepcard" style="margin-top:14px">
+    <div class="head">
+      <h3>애플 <span class="sym">AAPL</span></h3>
+      <span class="price">$355.63</span>
+      <span class="up">+2.04%</span>
+      <span class="counts">뉴스 호재 2 · 악재 1 · 중립 1</span>
+    </div>
+    <div class="oneline">2.04% 올라 52주 최고가(355.63달러)에서 마감했지만, 거래량은 20일 평균의 0.69배로 적었습니다.</div>
+    <ul class="news">
+      <li><span class="tag neg">악재</span><span>올해 주가가 많이 올라 2027년을 앞두고 &#39;비싸 보인다&#39;는 분석이 나왔습니다. 다만 2027 회계연도에도 매출 증가가 이어질 것이라는 애널리스트 전망도 함께 소개됐습니다. <span class="src"><a href="https://finance.yahoo.com/markets/stocks/articles/apple-shares-aapl-look-expensive-211500629.html" target="_blank" rel="noopener" title="Apple Shares (AAPL) Look Expensive Heading into 2027">[TipRanks]</a></span></span></li>
+      <li><span class="tag pos">호재</span><span>구글이 AI 음성 비서 &#39;제미나이&#39;를 애플 카플레이(차량용 화면)에서 쓸 수 있게 했습니다. 애플 생태계 안에서 AI 기능이 넓어지는 흐름입니다. <span class="src"><a href="https://finance.yahoo.com/technology/ai/articles/google-rolls-gemini-ai-voice-201340171.html" target="_blank" rel="noopener" title="Google rolls out Gemini AI voice assistant to Apple CarPlay dashboards">[Investing.com]</a></span></span></li>
+      <li><span class="tag neu">중립</span><span>희토류 자석 업체 MP머티리얼즈가 애플을 다음 고객으로 받을 계획이라고 밝혔다는 보도가 나왔습니다. 애플의 부품 공급망을 다양화하는 움직임과 관련된 내용입니다. <span class="src"><a href="https://www.marketbeat.com/instant-alerts/event-mp-materials-clears-gm-magnet-milestone-targets-apple-as-next-customer-2026-11-11/?utm_source=yahoofinance&amp;utm_medium=yahoofinance" target="_blank" rel="noopener" title="MP Materials Clears GM Magnet Milestone, Targets Apple as Next Customer">[MarketBeat]</a><a href="https://finance.yahoo.com/markets/stocks/articles/mp-materials-mp-q3-beat-191334168.html" target="_blank" rel="noopener" title="MP Materials (MP) Q3 Beat Raises The Question Of Whether Its Story Is Already Priced In">[Simply Wall St.]</a></span></span></li>
+      <li><span class="tag pos">호재</span><span>AI 관련 투자 심리가 살아나면서 기술주 전반이 반등한 날이었습니다. <span class="src"><a href="https://www.fool.com/coverage/stock-market-today/2026/11/11/stock-market-today-nov-11-stock-market-today-nov-11-nasdaq-surges-as-coreweave-s-25-rally-reignites-the-ai-trade/" target="_blank" rel="noopener" title="Stock Market Today, Nov. 11: Stock Market Today, Nov. 11: Nasdaq Surges as CoreWeave&#39;s 25% Rally Reignites the AI Trade">[Motley Fool]</a></span></span></li>
+    </ul>
+    <div class="three">
+      <div class="box p"><div class="label">긍정 요인</div><ul><li>52주 최고가에서 마감했고, 3개월 수익률은 +16.5%로 흐름이 강합니다.</li><li>분기 매출이 6월 분기 1,094.2억 달러에서 9월 분기 1,144.8억 달러로 늘었습니다. 2027 회계연도에도 매출 증가가 예상된다는 분석이 있습니다.</li><li>AI 서비스 제휴 등으로 아이폰·카플레이 생태계가 넓어지고 있습니다.</li></ul></div>
+      <div class="box n"><div class="label">부정 요인</div><ul><li>예상 이익 기준 주가수익비율(PER)이 33.72배로 높고, 애널리스트 평균 목표가는 현재가보다 3.1% 낮습니다. &#39;주가가 비싸다&#39;는 분석도 있습니다.</li><li>영업이익이 최근 3개 분기 내내 약 356억~359억 달러에 머물러, 매출이 늘어난 만큼 이익이 늘지는 않았습니다.</li><li>신고가를 기록한 날인데도 거래량이 20일 평균의 0.69배로 적었습니다.</li></ul></div>
+      <div class="box w"><div class="label">체크 포인트</div><ul><li>2027년 1월 29일 실적 발표: 매출 예상치 1,564.3억 달러, 주당순이익(EPS) 예상치 약 2.91달러를 넘는지</li><li>배당락일(2026-11-12) 전후 주가 움직임</li><li>외부 AI 서비스와의 제휴가 실제 기기 판매와 서비스 매출에 도움이 되는지</li></ul></div>
+    </div>
+    <div class="overall"><div class="label">종합 (중장기 관점)</div>매출은 꾸준히 늘고 있고 주가도 신고가에 올라와 있습니다. 다만 영업이익은 제자리 수준이고, 주가가 이익에 비해 높게 평가되어 있으며, 애널리스트 목표가도 현재가 아래에 있습니다. 중장기적으로는 연말 성수기 분기 실적이 이런 높은 기대를 충족하는지가 핵심입니다.</div>
+
+    <div class="fin">
+      <div class="label">최근 분기 실적 (야후 파이낸스 기준)</div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>분기</th><th>2025-12</th><th>2026-03</th><th>2026-06</th><th>2026-09</th></tr></thead>
+        <tbody>
+          <tr><td>매출</td><td>$143.8B</td><td>$111.2B</td><td>$109.4B</td><td>$114.5B</td></tr>
+          <tr><td>영업이익</td><td>$50.9B</td><td>$35.9B</td><td>$35.7B</td><td>$35.6B</td></tr>
+          <tr><td>순이익</td><td>$42.1B</td><td>$29.6B</td><td>$29.8B</td><td>$30.7B</td></tr>
+        </tbody>
+      </table></div>
+      <div class="muted small" style="margin-top:6px">
+        다음 실적 발표: 2027-01-29
+ · 다음 분기 매출 예상 $156.4B · 배당락일 2026-11-12      </div>
+    </div>
+  </div>
+  <div class="card deepcard" style="margin-top:14px">
+    <div class="head">
+      <h3>마이크론 <span class="sym">MU</span></h3>
+      <span class="price">$811.30</span>
+      <span class="up">+11.89%</span>
+      <span class="counts">뉴스 호재 2 · 악재 0 · 중립 2</span>
+    </div>
+    <div class="oneline">11.89% 급반등했지만, 52주 최고가보다는 여전히 33.15% 낮은 수준입니다.</div>
+    <ul class="news">
+      <li><span class="tag neu">중립</span><span>10월 29일부터 11월 5일까지 일주일 동안 주가가 29.7% 떨어졌습니다. 이에 대해 번스타인은 주가가 거의 두 배까지 오를 수 있다고 봤다는 보도가 나왔습니다. 고점 대비 40% 하락한 뒤 메모리 업황이 좋으면 다시 오를 수 있다는 분석 기사도 있었습니다. <span class="src"><a href="https://www.tikr.com/blog/micron-stock-fell-30-in-a-week-bernstein-says-it-could-nearly-double?ref=yahoofinance&amp;tlnk=yf-261111-vf93wfjf" target="_blank" rel="noopener" title="Micron Stock Fell 30% in a Week. Bernstein Says It Could Nearly Double">[TIKR]</a><a href="https://www.fool.com/investing/2026/11/11/micron-stock-is-down-40-from-its-peak-after-the-sell-off-history-says-this-is-what-happens-next/" target="_blank" rel="noopener" title="Micron Stock Is Down 40% From Its Peak After the Sell-Off. History Says This Is What Happens Next.">[Motley Fool]</a></span></span></li>
+      <li><span class="tag pos">호재</span><span>앤트로픽 상장과 함께 진행되는 사모 투자에 10억 달러를 넣기로 했다는 보도가 나왔습니다. 다른 대형 반도체·클라우드 기업들과 함께 AI 인프라 투자에 참여하는 모양새입니다. <span class="src"><a href="https://finance.yahoo.com/technology/ai/articles/micron-technology-mu-commits-1-221041537.html" target="_blank" rel="noopener" title="Micron Technology (MU) Commits $1 Billion To Landmark AI Infrastructure IPO">[Simply Wall St.]</a></span></span></li>
+      <li><span class="tag pos">호재</span><span>코어위브 실적을 계기로 반도체주가 크게 올랐고, 최근 많이 떨어진 종목을 싸게 사려는 매수가 들어왔습니다. <span class="src"><a href="https://www.investors.com/news/technology/chip-stocks-rally-amd-txn-arm-mtsi-mu/?src=A00220&amp;yptr=yahoo" target="_blank" rel="noopener" title="Chip Stocks Rally After Slide. These Names Are Leading The Charge Higher.">[Investor&#39;s Business Daily]</a><a href="https://www.fool.com/coverage/stock-market-today/2026/11/11/stock-market-today-nov-11-stock-market-today-nov-11-nasdaq-surges-as-coreweave-s-25-rally-reignites-the-ai-trade/" target="_blank" rel="noopener" title="Stock Market Today, Nov. 11: Stock Market Today, Nov. 11: Nasdaq Surges as CoreWeave&#39;s 25% Rally Reignites the AI Trade">[Motley Fool]</a><a href="https://www.wsj.com/livecoverage/stock-market-today-dow-sp-500-nasdaq-11-11-2026/card/stocks-to-watch-coreweave-nvidia-tsmc-EbakJv4ZyAl7obXOSamP?siteid=yhoof2&amp;yptr=yahoo" target="_blank" rel="noopener" title="Stocks to Watch Recap: CoreWeave, Nvidia, TSMC">[The Wall Street Journal]</a></span></span></li>
+      <li><span class="tag neu">중립</span><span>짐 크레이머가 같은 메모리 업체인 샌디스크보다 마이크론을 선호한다고 말했다는 보도가 나왔습니다. 다만 두 종목 모두 이번 달 기준으로는 여전히 크게 하락한 상태라고 합니다. <span class="src"><a href="https://247wallst.com/investing/2026/11/11/jim-cramer-says-micron-isnt-going-away-heres-why-he-picks-it-over-sandisk/" target="_blank" rel="noopener" title="Jim Cramer Says Micron Isn’t Going Away. Here’s Why He Picks It Over Sandisk">[24/7 Wall St.]</a></span></span></li>
+    </ul>
+    <div class="three">
+      <div class="box p"><div class="label">긍정 요인</div><ul><li>분기 매출이 136.4억 달러(2025-11)에서 542.3억 달러(2026-08)로, 영업이익이 61.4억 달러에서 437.5억 달러로 크게 늘었습니다.</li><li>예상 PER이 3.9배로 낮고, 애널리스트 평균 목표가는 현재가보다 92.52% 높습니다.</li><li>AI 인프라 투자에 직접 참여하는 등 AI 수요와의 연결이 강해지고 있습니다.</li></ul></div>
+      <div class="box n"><div class="label">부정 요인</div><ul><li>일주일 만에 약 30% 떨어지는 등 주가 변동이 매우 큽니다. 1개월(-14.89%), 3개월(-14.58%) 수익률도 마이너스입니다.</li><li>PER이 매우 낮다는 것은 시장이 지금 수준의 이익이 계속될지 의심하고 있다는 뜻일 수도 있습니다.</li><li>외부 기업에 10억 달러를 투자하는 만큼, 본업이 아닌 투자 손익에 따라 이익이 흔들릴 수 있습니다.</li></ul></div>
+      <div class="box w"><div class="label">체크 포인트</div><ul><li>2026년 12월 24일 실적 발표: 매출 예상치 618.3억 달러, EPS 예상치 약 38.29달러를 넘는지</li><li>메모리 가격과 수요가 꺾이는 신호가 나오는지</li><li>앤트로픽 상장이 어떻게 진행되는지</li></ul></div>
+    </div>
+    <div class="overall"><div class="label">종합 (중장기 관점)</div>최근 4개 분기 동안 매출과 이익이 빠르게 늘어, 실적 흐름은 매우 강합니다. 다만 메모리 산업은 경기에 따라 크게 오르내리는 특성이 있어, 주가가 짧은 기간에 크게 출렁이고 있습니다. 중장기적으로는 높은 이익이 얼마나 오래 유지될지가 핵심입니다.</div>
+
+    <div class="fin">
+      <div class="label">최근 분기 실적 (야후 파이낸스 기준)</div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>분기</th><th>2025-11</th><th>2026-02</th><th>2026-05</th><th>2026-08</th></tr></thead>
+        <tbody>
+          <tr><td>매출</td><td>$13.6B</td><td>$23.9B</td><td>$41.5B</td><td>$54.2B</td></tr>
+          <tr><td>영업이익</td><td>$6.1B</td><td>$16.1B</td><td>$33.3B</td><td>$43.8B</td></tr>
+          <tr><td>순이익</td><td>$5.2B</td><td>$13.8B</td><td>$28.2B</td><td>$37.7B</td></tr>
+        </tbody>
+      </table></div>
+      <div class="muted small" style="margin-top:6px">
+        다음 실적 발표: 2026-12-24
+ · 다음 분기 매출 예상 $61.8B      </div>
+    </div>
+  </div>
+  <div class="card deepcard" style="margin-top:14px">
+    <div class="head">
+      <h3>오라클 <span class="sym">ORCL</span></h3>
+      <span class="price">$128.38</span>
+      <span class="up">+8.82%</span>
+      <span class="counts">뉴스 호재 3 · 악재 0 · 중립 1</span>
+    </div>
+    <div class="oneline">코어위브 실적 덕분에 AI 투자용 빚 걱정이 줄면서 8.82% 반등했지만, 52주 최고가보다는 여전히 48.27% 낮습니다.</div>
+    <ul class="news">
+      <li><span class="tag pos">호재</span><span>코어위브의 3분기 실적(매출 168% 증가)과 자금 조달 조정으로 &#39;AI 투자에 쓰이는 빚&#39; 걱정이 줄었고, 오라클을 포함한 AI 관련주가 함께 올랐습니다. <span class="src"><a href="https://www.fool.com/investing/2026/11/11/why-oracle-stock-is-up-today/" target="_blank" rel="noopener" title="Why Oracle Stock Is Up Today">[Motley Fool]</a><a href="https://finance.yahoo.com/markets/stocks/articles/oracle-stocks-climb-7-2-183823857.html" target="_blank" rel="noopener" title="Oracle Stocks Climb 7.2% as CoreWeave&#39;s Funding Reset Eases AI Debt Fears">[GuruFocus.com]</a><a href="https://decrypt.co/383099/nvidia-backed-coreweave-surging-what-means-for-ai-boom" target="_blank" rel="noopener" title="Nvidia-Backed CoreWeave Is Surging: Here’s What It Means for the AI Boom">[decrypt]</a><a href="https://www.fool.com/coverage/stock-market-today/2026/11/11/stock-market-today-nov-11-stock-market-today-nov-11-nasdaq-surges-as-coreweave-s-25-rally-reignites-the-ai-trade/" target="_blank" rel="noopener" title="Stock Market Today, Nov. 11: Stock Market Today, Nov. 11: Nasdaq Surges as CoreWeave&#39;s 25% Rally Reignites the AI Trade">[Motley Fool]</a><a href="https://www.investors.com/news/technology/ai-stocks-coreweave-anthropic-artificial-intelligence/?src=A00220&amp;yptr=yahoo" target="_blank" rel="noopener" title="Are AI Bulls Back? Looks Like It Thanks To Anthropic, CoreWeave, Nvidia">[Investor&#39;s Business Daily]</a></span></span></li>
+      <li><span class="tag neu">중립</span><span>주가가 100억 달러 규모 주식 발행 때의 가격(116달러)을 다시 넘어섰습니다. 한편 새로 발행한 채권 중에는 이자율이 최대 8.65%인 것도 있다는 보도가 나왔습니다. <span class="src"><a href="https://finance.yahoo.com/markets/stocks/articles/oracle-stocks-climb-7-2-183823857.html" target="_blank" rel="noopener" title="Oracle Stocks Climb 7.2% as CoreWeave&#39;s Funding Reset Eases AI Debt Fears">[GuruFocus.com]</a></span></span></li>
+      <li><span class="tag pos">호재</span><span>힐러리 맥슨 최고재무책임자(CFO)가 데이터센터 용량을 7기가와트 늘리겠다고 밝혔습니다. <span class="src"><a href="https://www.investors.com/news/technology/oracle-stock-cfo-hilary-maxson-ai-demand/?src=A00220&amp;yptr=yahoo" target="_blank" rel="noopener" title="Oracle Stock Gets A Boost. Here&#39;s What&#39;s Next For Tech Giant&#39;s AI Push.">[Investor&#39;s Business Daily]</a></span></span></li>
+      <li><span class="tag pos">호재</span><span>데이터센터 건설에 대한 정치적 반발이 커지는 상황에서 오라클이 경쟁사보다 유리한 위치에 있다고 보는 애널리스트 의견이 소개됐습니다. <span class="src"><a href="https://www.fool.com/investing/2026/11/11/oracle-stock-just-surged-after-coreweave-earnings-here-s-why-one-analyst-says-it-s-built-for-the-data-center-backlash/" target="_blank" rel="noopener" title="Oracle Stock Just Surged After CoreWeave Earnings. Here&#39;s Why One Analyst Says It&#39;s Built for the Data-Center Backlash">[Motley Fool]</a></span></span></li>
+    </ul>
+    <div class="three">
+      <div class="box p"><div class="label">긍정 요인</div><ul><li>분기 매출이 160.6억 달러(2025-11)에서 193.5억 달러(2026-08)로 꾸준히 늘었습니다.</li><li>데이터센터 용량을 7기가와트 늘리는 계획으로 AI 인프라 사업을 키우고 있습니다.</li><li>예상 PER은 11.61배이고, 애널리스트 평균 목표가는 현재가보다 83.97% 높습니다.</li></ul></div>
+      <div class="box n"><div class="label">부정 요인</div><ul><li>데이터센터 투자를 위해 빚을 늘리고 있습니다. 일부 신규 채권의 이자율이 최대 8.65%로 높고, 100억 달러 규모의 주식 발행도 있었습니다.</li><li>최근 분기 영업이익이 69.6억 달러에서 68.2억 달러로 약간 줄었습니다.</li><li>급등한 날인데도 거래량이 20일 평균의 0.87배에 그쳤고, 3개월 수익률은 -17.82%입니다.</li></ul></div>
+      <div class="box w"><div class="label">체크 포인트</div><ul><li>2026년 12월 15일 실적 발표: 매출 예상치 213.3억 달러, EPS 예상치 1.89달러를 넘는지</li><li>빚을 얼마나 더 늘리는지, 그리고 이자 부담이 어느 정도인지</li><li>데이터센터 증설이 계획대로 진행되는지, 정치적 반발이 생기는지</li></ul></div>
+    </div>
+    <div class="overall"><div class="label">종합 (중장기 관점)</div>매출은 꾸준히 늘고 있고 AI 데이터센터 확장 계획도 큽니다. 다만 그 투자 자금을 빚과 주식 발행으로 마련하고 있어, AI 투자 심리와 금리 환경에 따라 주가가 크게 흔들려 왔습니다. 중장기적으로는 투자한 만큼 이익이 늘어나는지, 그리고 재무 부담을 감당할 수 있는지를 함께 봐야 합니다.</div>
+
+    <div class="fin">
+      <div class="label">최근 분기 실적 (야후 파이낸스 기준)</div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>분기</th><th>2025-11</th><th>2026-02</th><th>2026-05</th><th>2026-08</th></tr></thead>
+        <tbody>
+          <tr><td>매출</td><td>$16.1B</td><td>$17.2B</td><td>$19.2B</td><td>$19.3B</td></tr>
+          <tr><td>영업이익</td><td>$5.2B</td><td>$5.6B</td><td>$7.0B</td><td>$6.8B</td></tr>
+          <tr><td>순이익</td><td>$6.1B</td><td>$3.7B</td><td>$4.3B</td><td>$4.8B</td></tr>
+        </tbody>
+      </table></div>
+      <div class="muted small" style="margin-top:6px">
+        다음 실적 발표: 2026-12-15
+ · 다음 분기 매출 예상 $21.3B      </div>
+    </div>
+  </div>
+
+  <details>
+    <summary>섹터 종목별 최근 뉴스 제목 보기</summary>
+    <ul class="hl">
+      <li><b>애플</b><a href="https://www.barrons.com/articles/nvidia-stock-price-huang-affair-ceo-ouster-26c99dad?siteid=yhoof2&amp;yptr=yahoo" target="_blank" rel="noopener">Nvidia Stock Tumbles. Jensen Huang Could Be Out Soon.</a>
+        <span class="muted small">Barrons.com 11/12 10:06</span></li>
+      <li><b></b><a href="https://www.fool.com/coverage/stock-market-today/2026/11/11/stock-market-today-nov-11-stock-market-today-nov-11-nasdaq-surges-as-coreweave-s-25-rally-reignites-the-ai-trade/" target="_blank" rel="noopener">Stock Market Today, Nov. 11: Stock Market Today, Nov. 11: Nasdaq Surges as CoreWeave&#39;s 25% Rally Reignites the AI Trade</a>
+        <span class="muted small">Motley Fool 11/12 07:45</span></li>
+      <li><b></b><a href="https://finance.yahoo.com/markets/stocks/articles/apple-shares-aapl-look-expensive-211500629.html" target="_blank" rel="noopener">Apple Shares (AAPL) Look Expensive Heading into 2027</a>
+        <span class="muted small">TipRanks 11/12 06:15</span></li>
+      <li><b></b><a href="https://www.trefis.com/stock/dell/articles/624271/is-dell-stock-priced-right-against-its-peers/2026-11-11" target="_blank" rel="noopener">Is Dell Stock Priced Right Against Its Peers?</a>
+        <span class="muted small">Trefis 11/12 05:49</span></li>
+      <li><b></b><a href="https://finance.yahoo.com/technology/ai/articles/google-rolls-gemini-ai-voice-201340171.html" target="_blank" rel="noopener">Google rolls out Gemini AI voice assistant to Apple CarPlay dashboards</a>
+        <span class="muted small">Investing.com 11/12 05:13</span></li>
+      <li><b>엔비디아</b><a href="https://finance.yahoo.com/markets/stocks/article/who-is-nvidia-executive-kimberly-powell-231652963.html" target="_blank" rel="noopener">Who is Nvidia executive Kimberly Powell?</a>
+        <span class="muted small">Yahoo Finance 11/12 08:16</span></li>
+      <li><b></b><a href="https://finance.yahoo.com/technology/article/nvidia-reportedly-preparing-to-oust-ceo-huang-after-alleged-affairs-with-spy-nvidia-exec-231315876.html" target="_blank" rel="noopener">Nvidia reportedly preparing to oust CEO Huang after alleged affairs with spy, Nvidia exec</a>
+        <span class="muted small">Yahoo Finance 11/12 07:18</span></li>
+      <li><b></b><a href="https://finance.yahoo.com/video/anthropics-mythos-claim-may-put-nvidias-cuda-moat-in-a-vulnerable-spot-214346380.html" target="_blank" rel="noopener">Anthropic&#39;s Mythos claim may put Nvidia’s CUDA moat in a vulnerable spot</a>
+        <span class="muted small">Yahoo Finance Video 11/12 06:43</span></li>
+      <li><b></b><a href="https://finance.yahoo.com/video/tech-round-up-a-closer-look-at-anthropic-nvidia-coreweave-and-next-week-211955539.html" target="_blank" rel="noopener">Tech round-up: A closer look at Anthropic, Nvidia, CoreWeave, and next week</a>
+        <span class="muted small">Yahoo Finance Video 11/12 06:19</span></li>
+      <li><b></b><a href="https://finance.yahoo.com/markets/stocks/article/nvidia-stock-is-pricing-in-2-major-risks-as-ceo-jensen-huangs-affair-fallout-plays-out-190743109.html" target="_blank" rel="noopener">Nvidia stock is pricing in 2 major risks as CEO Jensen Huang&#39;s affair fallout plays out</a>
+        <span class="muted small">Yahoo Finance 11/12 04:07</span></li>
+      <li><b>마이크로소프트</b><a href="https://finance.yahoo.com/video/is-the-ai-boom-hiding-a-jobs-crisis-for-graduates-214503208.html" target="_blank" rel="noopener">Is the AI boom hiding a jobs crisis for graduates?</a>
+        <span class="muted small">Yahoo Finance Video 11/12 06:45</span></li>
+      <li><b></b><a href="https://finance.yahoo.com/video/anthropics-new-claude-tools-put-software-stocks-on-notice-151339178.html" target="_blank" rel="noopener">Anthropic&#39;s new Claude tools put software stocks on notice</a>
+        <span class="muted small">Yahoo Finance Video 11/12 00:13</span></li>
+      <li><b></b><a href="https://finance.yahoo.com/technology/articles/market-chatter-microsoft-wants-power-000818359.html" target="_blank" rel="noopener">Market Chatter: Microsoft Wants to Power Data Centers Without Subsidies or Higher Costs for Others</a>
+        <span class="muted small">MT Newswires 11/12 09:08</span></li>
+      <li><b></b><a href="https://finance.yahoo.com/energy/articles/fusions-next-race-over-superconducting-230000192.html" target="_blank" rel="noopener">Fusion&#39;s Next Race Is Over Superconducting Tape, Not Plasma</a>
+        <span class="muted small">Oilprice.com 11/12 08:00</span></li>
+      <li><b></b><a href="https://www.fool.com/coverage/stock-market-today/2026/11/11/stock-market-today-nov-11-iren-rises-as-ai-cloud-peers-rally-on-coreweave-results/" target="_blank" rel="noopener">Stock Market Today, Nov. 11: IREN Rises as AI Cloud Peers Rally on CoreWeave Results</a>
+        <span class="muted small">Motley Fool 11/12 07:25</span></li>
+      <li><b>브로드컴</b><a href="https://www.trefis.com/stock/crdo/articles/624229/how-much-could-you-lose-in-credo-stock/2026-11-11" target="_blank" rel="noopener">How Much Could You Lose In Credo Stock?</a>
+        <span class="muted small">Trefis 11/12 10:12</span></li>
+      <li><b></b><a href="https://finance.yahoo.com/markets/stocks/articles/nvidia-stock-sinks-jensen-huang-002504447.html" target="_blank" rel="noopener">Nvidia Stock Sinks as Jensen Huang Ouster Report Sends Investors Toward AMD, Broadcom</a>
+        <span class="muted small">Benzinga 11/12 09:25</span></li>
+      <li><b></b><a href="https://finance.yahoo.com/news/nvidia-preparing-oust-ceo-jensen-223546395.html" target="_blank" rel="noopener">Nvidia board meets to decide CEO Huang&#39;s future, source says</a>
+        <span class="muted small">Reuters 11/12 09:23</span></li>
+      <li><b></b><a href="https://247wallst.com/investing/2026/11/11/more-bad-news-for-nvidia-with-board-planning-to-boot-jensen-huang-sam-altman-reveals-master-plan-to-stop-buying-their-chips/" target="_blank" rel="noopener">More Bad News for NVIDIA. With Board Planning to Boot Jensen Huang, Sam Altman Reveals Master Plan to Stop Buying Their Chips</a>
+        <span class="muted small">24/7 Wall St. 11/12 09:19</span></li>
+      <li><b></b><a href="https://www.wsj.com/livecoverage/stock-market-today-dow-sp-500-nasdaq-11-11-2026/card/stocks-to-watch-coreweave-nvidia-tsmc-EbakJv4ZyAl7obXOSamP?siteid=yhoof2&amp;yptr=yahoo" target="_blank" rel="noopener">Stocks to Watch Recap: CoreWeave, Nvidia, TSMC</a>
+        <span class="muted small">The Wall Street Journal 11/12 06:49</span></li>
+      <li><b>마이크론</b><a href="https://finance.yahoo.com/video/ai-trade-bounces-back-kalshi-possibly-facing-charges-openai-continues-to-see-heavy-losses-144418293.html" target="_blank" rel="noopener">AI Trade bounces back, Kalshi possibly facing charges, OpenAI continues to see heavy losses</a>
+        <span class="muted small">Yahoo Finance Video 11/11 23:44</span></li>
+      <li><b></b><a href="https://finance.yahoo.com/markets/stocks/articles/3-growth-stocks-earnings-growth-011311704.html" target="_blank" rel="noopener">3 Growth Stocks With Earnings Growth Over 20%</a>
+        <span class="muted small">Simply Wall St. 11/12 10:13</span></li>
+      <li><b></b><a href="https://finance.yahoo.com/markets/stocks/articles/q3-earnings-results-reconfirm-broad-233700093.html" target="_blank" rel="noopener">Q3 Earnings Results Reconfirm Broad-Based Strength as Outlook Improves</a>
+        <span class="muted small">Zacks 11/12 08:37</span></li>
+      <li><b></b><a href="https://www.fool.com/coverage/stock-market-today/2026/11/11/stock-market-today-nov-11-stock-market-today-nov-11-nasdaq-surges-as-coreweave-s-25-rally-reignites-the-ai-trade/" target="_blank" rel="noopener">Stock Market Today, Nov. 11: Stock Market Today, Nov. 11: Nasdaq Surges as CoreWeave&#39;s 25% Rally Reignites the AI Trade</a>
+        <span class="muted small">Motley Fool 11/12 07:45</span></li>
+      <li><b></b><a href="https://www.fool.com/investing/2026/11/11/micron-stock-is-down-40-from-its-peak-after-the-sell-off-history-says-this-is-what-happens-next/" target="_blank" rel="noopener">Micron Stock Is Down 40% From Its Peak After the Sell-Off. History Says This Is What Happens Next.</a>
+        <span class="muted small">Motley Fool 11/12 07:34</span></li>
+      <li><b>AMD</b><a href="https://finance.yahoo.com/video/anthropics-mythos-claim-may-put-nvidias-cuda-moat-in-a-vulnerable-spot-214346380.html" target="_blank" rel="noopener">Anthropic&#39;s Mythos claim may put Nvidia’s CUDA moat in a vulnerable spot</a>
+        <span class="muted small">Yahoo Finance Video 11/12 06:43</span></li>
+      <li><b></b><a href="https://www.investors.com/market-trend/stock-market-today/dow-jones-futures-coreweave-sandisk-nvidia-amd-nebius-bloom/?src=A00220&amp;yptr=yahoo" target="_blank" rel="noopener">Dow Jones Futures: Techs Tumble As Nvidia May Oust CEO Huang; AI Stocks Slide, But Not AMD</a>
+        <span class="muted small">Investor&#39;s Business Daily 11/12 10:45</span></li>
+      <li><b></b><a href="https://247wallst.com/investing/2026/11/11/meet-ian-buck-the-nvidia-executive-insiders-believe-is-the-one-man-who-can-replace-jensen-huang/" target="_blank" rel="noopener">Meet Ian Buck: The NVIDIA Executive Insiders Believe Is the One Man Who Can Replace Jensen Huang</a>
+        <span class="muted small">24/7 Wall St. 11/12 10:11</span></li>
+      <li><b></b><a href="https://finance.yahoo.com/markets/stocks/articles/nvidia-stock-sinks-jensen-huang-002504447.html" target="_blank" rel="noopener">Nvidia Stock Sinks as Jensen Huang Ouster Report Sends Investors Toward AMD, Broadcom</a>
+        <span class="muted small">Benzinga 11/12 09:25</span></li>
+      <li><b></b><a href="https://finance.yahoo.com/news/nvidia-preparing-oust-ceo-jensen-223546395.html" target="_blank" rel="noopener">Nvidia board meets to decide CEO Huang&#39;s future, source says</a>
+        <span class="muted small">Reuters 11/12 09:23</span></li>
+      <li><b>팔란티어</b><a href="https://finance.yahoo.com/markets/stocks/articles/3-growth-stocks-earnings-growth-011311704.html" target="_blank" rel="noopener">3 Growth Stocks With Earnings Growth Over 20%</a>
+        <span class="muted small">Simply Wall St. 11/12 10:13</span></li>
+      <li><b></b><a href="https://www.fool.com/investing/2026/11/11/3-possible-paths-forward-for-ai-stocks-bull-case-b/" target="_blank" rel="noopener">3 Possible Paths Forward for AI Stocks (Bull Case, Bear Case, Base Case) -- and How to Invest for Each</a>
+        <span class="muted small">Motley Fool 11/12 04:24</span></li>
+      <li><b></b><a href="https://finance.yahoo.com/technology/ai/articles/helsing-debuts-clarity-military-ai-161625762.html" target="_blank" rel="noopener">Helsing debuts Clarity military AI to challenge Palantir in Europe</a>
+        <span class="muted small">Investing.com 11/12 01:16</span></li>
+      <li><b></b><a href="https://www.tikr.com/blog/one-investor-says-anthropic-would-cost-less-than-palantir-on-sales-thats-a-problem-for-palantir?ref=yahoofinance&amp;tlnk=yf-261111-pwg7jvj8" target="_blank" rel="noopener">One Investor Says Anthropic Would Cost “Less Than Palantir on Sales.” That’s a Problem for Palantir</a>
+        <span class="muted small">TIKR 11/12 01:08</span></li>
+      <li><b></b><a href="https://247wallst.com/investing/2026/11/11/prediction-palantir-shares-could-deliver-outsized-returns-over-the-next-5-years/" target="_blank" rel="noopener">Prediction: Palantir Shares Could Deliver Outsized Returns Over the Next 5 Years</a>
+        <span class="muted small">24/7 Wall St. 11/12 00:33</span></li>
+      <li><b>오라클</b><a href="https://www.fool.com/coverage/stock-market-today/2026/11/11/stock-market-today-nov-11-stock-market-today-nov-11-nasdaq-surges-as-coreweave-s-25-rally-reignites-the-ai-trade/" target="_blank" rel="noopener">Stock Market Today, Nov. 11: Stock Market Today, Nov. 11: Nasdaq Surges as CoreWeave&#39;s 25% Rally Reignites the AI Trade</a>
+        <span class="muted small">Motley Fool 11/12 07:45</span></li>
+      <li><b></b><a href="https://decrypt.co/383099/nvidia-backed-coreweave-surging-what-means-for-ai-boom" target="_blank" rel="noopener">Nvidia-Backed CoreWeave Is Surging: Here’s What It Means for the AI Boom</a>
+        <span class="muted small">decrypt 11/12 07:36</span></li>
+      <li><b></b><a href="https://247wallst.com/investing/2026/11/11/how-much-tax-does-a-66-year-old-owe-selling-600000-in-micron-and-oracle-gains/" target="_blank" rel="noopener">How Much Tax Does a 66-Year-Old Owe Selling $600,000 in Micron and Oracle Gains?</a>
+        <span class="muted small">24/7 Wall St. 11/12 07:18</span></li>
+      <li><b></b><a href="https://www.fool.com/investing/2026/11/11/oracle-stock-just-surged-after-coreweave-earnings-here-s-why-one-analyst-says-it-s-built-for-the-data-center-backlash/" target="_blank" rel="noopener">Oracle Stock Just Surged After CoreWeave Earnings. Here&#39;s Why One Analyst Says It&#39;s Built for the Data-Center Backlash</a>
+        <span class="muted small">Motley Fool 11/12 07:11</span></li>
+      <li><b></b><a href="https://www.investors.com/news/technology/oracle-stock-cfo-hilary-maxson-ai-demand/?src=A00220&amp;yptr=yahoo" target="_blank" rel="noopener">Oracle Stock Gets A Boost. Here&#39;s What&#39;s Next For Tech Giant&#39;s AI Push.</a>
+        <span class="muted small">Investor&#39;s Business Daily 11/12 06:36</span></li>
+      <li><b>시스코</b><a href="https://www.trefis.com/stock/dell/articles/624271/is-dell-stock-priced-right-against-its-peers/2026-11-11" target="_blank" rel="noopener">Is Dell Stock Priced Right Against Its Peers?</a>
+        <span class="muted small">Trefis 11/12 05:49</span></li>
+      <li><b></b><a href="https://finance.yahoo.com/markets/stocks/articles/cisco-csco-considered-good-investment-202243792.html" target="_blank" rel="noopener">Cisco (CSCO) Is Considered a Good Investment by Brokers: Is That True?</a>
+        <span class="muted small">Zacks 11/12 05:22</span></li>
+      <li><b></b><a href="https://finance.yahoo.com/technology/ai/articles/cisco-systems-csco-building-ai-200812215.html" target="_blank" rel="noopener">What Is Cisco Systems (CSCO) Building With Its New AI Defense Push?</a>
+        <span class="muted small">Simply Wall St. 11/12 05:08</span></li>
+      <li><b></b><a href="https://www.trefis.com/stock/tel/articles/624323/is-te-connectivitys-buyback-still-lifting-earnings-per-share/2026-11-11" target="_blank" rel="noopener">Is TE Connectivity’s Buyback Still Lifting Earnings Per Share?</a>
+        <span class="muted small">Trefis 11/12 03:51</span></li>
+      <li><b></b><a href="https://finance.yahoo.com/markets/stocks/articles/cisco-earnings-preview-eps-margins-180725950.html" target="_blank" rel="noopener">Cisco earnings preview: EPS, margins, and guidance in focus</a>
+        <span class="muted small">Investing.com 11/12 03:07</span></li>
+      <li><b>어플라이드 머티리얼즈</b><a href="https://finance.yahoo.com/markets/stocks/articles/applied-materials-amat-rebounds-ahead-221207418.html" target="_blank" rel="noopener">Applied Materials (AMAT) Rebounds Ahead Of Earnings, Is It Still Trading At A Discount?</a>
+        <span class="muted small">Simply Wall St. 11/12 07:12</span></li>
+      <li><b></b><a href="https://finance.yahoo.com/markets/stocks/articles/semiconductor-equipment-stocks-fundamentals-fair-210035577.html" target="_blank" rel="noopener">Semiconductor equipment stocks: fundamentals, fair value, and the top pick</a>
+        <span class="muted small">Investing.com 11/12 06:00</span></li>
+      <li><b></b><a href="https://www.tikr.com/blog/13-big-funds-sold-applied-materials-should-you-follow-them-before-earnings?ref=yahoofinance&amp;tlnk=yf-261111-wwqhg338" target="_blank" rel="noopener">13 Big Funds Sold Applied Materials. Should You Follow Them Before Earnings?</a>
+        <span class="muted small">TIKR 11/12 05:28</span></li>
+      <li><b></b><a href="https://247wallst.com/investing/2026/11/11/applied-materials-rallies-8-ahead-of-earnings-as-chip-stocks-rebound-lam-research-jumps-9-kla-climbs-7/" target="_blank" rel="noopener">Applied Materials Rallies 8% Ahead of Earnings as Chip Stocks Rebound; Lam Research Jumps 9%, KLA Climbs 7%</a>
+        <span class="muted small">24/7 Wall St. 11/12 04:02</span></li>
+      <li><b></b><a href="https://finance.yahoo.com/markets/stocks/articles/applied-materials-stocks-climb-5-183951114.html" target="_blank" rel="noopener">Applied Materials Stocks Climb 5.72% a Day Before Fourth-Quarter Results</a>
+        <span class="muted small">GuruFocus.com 11/12 03:39</span></li>
+    </ul>
+  </details>
+</section>
+<section id="us_hc">
+  <h2>미국 · 헬스케어</h2>
+<div class="card"><div class="label">섹터 요약</div>미국 헬스케어 대형주는 하루 등락이 대부분 ±1% 이내로 조용했고, 거래량도 모든 종목이 20일 평균보다 적었습니다. 수요일 오후 NYSE 헬스케어 지수가 0.6% 내렸다는 보도가 있었습니다. 최근 1개월로 보면 릴리(+23.21%), 길리어드(+14.74%), 암젠(+13.39%)이 크게 올랐고 릴리와 애브비는 52주 최고가 수준이지만, 애보트는 52주 고점보다 16.31% 낮아 약한 흐름입니다. 뉴스는 비만 치료제 경쟁과 임상 결과 발표가 중심이었습니다.</div>
+  <div class="table-wrap">
+  <table>
+    <thead><tr>
+      <th>종목 (시가총액순)</th><th>현재가</th><th>1일</th><th>1주</th><th>1개월</th><th>3개월</th>
+      <th>거래량<br>(20일 평균 대비)</th><th>52주 고점 대비</th><th>시가총액</th><th>예상 PER</th>
+      <th>목표가 괴리</th><th>애널리스트</th>
+    </tr></thead>
+    <tbody>
+    <tr class="deep">
+      <td>일라이 릴리<span class="sym">LLY</span></td>
+      <td>$1,437.29</td>
+      <td class="up">+0.3%</td>
+      <td class="up">+1.4%</td>
+      <td class="up">+23.2%</td>
+      <td class="up">+18.9%</td>
+      <td>0.6배</td>
+      <td class="flat">+0.0%</td>
+      <td>$1.28T</td>
+      <td>28.4</td>
+      <td class="up">+1.1%</td>
+      <td>매수 <span class="muted">(29명)</span></td>
+    </tr>
+    <tr class="">
+      <td>존슨앤드존슨<span class="sym">JNJ</span></td>
+      <td>$280.41</td>
+      <td class="down">-0.1%</td>
+      <td class="up">+1.5%</td>
+      <td class="up">+12.8%</td>
+      <td class="up">+7.0%</td>
+      <td>0.7배</td>
+      <td class="down">-0.6%</td>
+      <td>$675.0B</td>
+      <td>24.1</td>
+      <td class="down">-0.4%</td>
+      <td>매수 <span class="muted">(22명)</span></td>
+    </tr>
+    <tr class="">
+      <td>애브비<span class="sym">ABBV</span></td>
+      <td>$294.98</td>
+      <td class="up">+0.4%</td>
+      <td class="up">+0.1%</td>
+      <td class="up">+7.5%</td>
+      <td class="up">+17.6%</td>
+      <td>0.6배</td>
+      <td class="flat">+0.0%</td>
+      <td>$521.4B</td>
+      <td>18.2</td>
+      <td class="up">+5.3%</td>
+      <td>매수 <span class="muted">(26명)</span></td>
+    </tr>
+    <tr class="">
+      <td>머크<span class="sym">MRK</span></td>
+      <td>$147.18</td>
+      <td class="down">-0.6%</td>
+      <td class="down">-2.1%</td>
+      <td class="up">+3.7%</td>
+      <td class="up">+8.6%</td>
+      <td>0.6배</td>
+      <td class="down">-5.9%</td>
+      <td>$362.8B</td>
+      <td>16.4</td>
+      <td class="up">+9.7%</td>
+      <td>매수 <span class="muted">(26명)</span></td>
+    </tr>
+    <tr class="">
+      <td>유나이티드헬스<span class="sym">UNH</span></td>
+      <td>$402.94</td>
+      <td class="down">-0.5%</td>
+      <td class="down">-1.6%</td>
+      <td class="up">+6.7%</td>
+      <td class="up">+1.0%</td>
+      <td>0.7배</td>
+      <td class="down">-7.7%</td>
+      <td>$361.0B</td>
+      <td>17.3</td>
+      <td class="up">+18.2%</td>
+      <td>매수 <span class="muted">(25명)</span></td>
+    </tr>
+    <tr class="">
+      <td>써모피셔<span class="sym">TMO</span></td>
+      <td>$717.71</td>
+      <td class="down">-0.1%</td>
+      <td class="up">+1.6%</td>
+      <td class="up">+8.2%</td>
+      <td class="up">+20.4%</td>
+      <td>0.8배</td>
+      <td class="down">-0.5%</td>
+      <td>$265.9B</td>
+      <td>25.8</td>
+      <td class="up">+5.4%</td>
+      <td>강력매수 <span class="muted">(25명)</span></td>
+    </tr>
+    <tr class="">
+      <td>암젠<span class="sym">AMGN</span></td>
+      <td>$468.11</td>
+      <td class="up">+0.6%</td>
+      <td class="down">-2.2%</td>
+      <td class="up">+13.4%</td>
+      <td class="up">+12.0%</td>
+      <td>0.7배</td>
+      <td class="down">-2.2%</td>
+      <td>$253.2B</td>
+      <td>18.7</td>
+      <td class="down">-7.8%</td>
+      <td>중립 <span class="muted">(29명)</span></td>
+    </tr>
+    <tr class="deep">
+      <td>길리어드<span class="sym">GILD</span></td>
+      <td>$169.73</td>
+      <td class="down">-0.7%</td>
+      <td class="down">-2.7%</td>
+      <td class="up">+14.7%</td>
+      <td class="up">+22.9%</td>
+      <td>0.7배</td>
+      <td class="down">-2.7%</td>
+      <td>$210.5B</td>
+      <td>16.8</td>
+      <td class="up">+3.0%</td>
+      <td>매수 <span class="muted">(26명)</span></td>
+    </tr>
+    <tr class="deep">
+      <td>애보트<span class="sym">ABT</span></td>
+      <td>$109.29</td>
+      <td class="down">-1.1%</td>
+      <td class="down">-5.4%</td>
+      <td class="up">+6.5%</td>
+      <td class="down">-1.8%</td>
+      <td>0.9배</td>
+      <td class="down">-16.3%</td>
+      <td>$189.3B</td>
+      <td>18.4</td>
+      <td class="up">+8.8%</td>
+      <td>매수 <span class="muted">(26명)</span></td>
+    </tr>
+    <tr class="">
+      <td>화이자<span class="sym">PFE</span></td>
+      <td>$29.45</td>
+      <td class="up">+0.3%</td>
+      <td class="down">-4.4%</td>
+      <td class="up">+3.8%</td>
+      <td class="up">+9.9%</td>
+      <td>0.7배</td>
+      <td class="down">-4.4%</td>
+      <td>$167.9B</td>
+      <td>10.0</td>
+      <td class="up">+2.6%</td>
+      <td>매수 <span class="muted">(26명)</span></td>
+    </tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="muted small" style="margin-top:6px">
+    기준일 2026-11-11
+종가    · 예상 PER = 주가 ÷ 향후 12개월 예상 주당순이익 · 목표가 괴리 = 애널리스트 평균 목표가와 현재가 차이
+  </div>
+
+  <div class="card deepcard" style="margin-top:14px">
+    <div class="head">
+      <h3>일라이 릴리 <span class="sym">LLY</span></h3>
+      <span class="price">$1,437.29</span>
+      <span class="up">+0.35%</span>
+      <span class="counts">뉴스 호재 1 · 악재 1 · 중립 3</span>
+    </div>
+    <div class="oneline">52주 최고가 수준(1,437.29달러)에서 +0.35%로 보합 마감했고 거래량은 20일 평균의 0.6배로 적었습니다. 매출 전망 상향 보도와 가격이 비싸다는 논쟁이 함께 나왔습니다.</div>
+    <ul class="news">
+      <li><span class="tag pos">호재</span><span>릴리가 2026년 매출 전망을 최대 920억 달러로 올렸다는 보도가 있습니다. 작년 매출이 44.7% 늘었다는 언급도 함께 나왔습니다. <span class="src"><a href="https://www.fool.com/investing/2026/11/11/eli-lilly-just-raised-its-2026-sales-forecast-to-a/" target="_blank" rel="noopener" title="Eli Lilly Just Raised Its 2026 Sales Forecast to as Much as $92 Billion. But Is Viking Therapeutics the Next Big Obesity Winner?">[Motley Fool]</a><a href="https://www.fool.com/coverage/better-buy/2026/11/11/johnson-and-johnson-vs-eli-lilly-which-healthcare-giant-s-stock-is-a-better-buy-for-2027/" target="_blank" rel="noopener" title="Johnson &amp; Johnson vs. Eli Lilly: Which Healthcare Giant&#39;s Stock Is a Better Buy for 2027?">[Motley Fool]</a></span></span></li>
+      <li><span class="tag neu">중립</span><span>뱅크오브아메리카(BofA)가 &#39;중요 이벤트&#39;를 앞두고 릴리 목표주가를 조정했다는 보도입니다. 비만 치료제 외 사업의 가능성을 언급했다고 알려졌으며, 목표가를 올렸는지 내렸는지는 제목만으로는 알 수 없습니다. <span class="src"><a href="https://www.thestreet.com/investing/stocks/bank-of-america-raises-eli-lilly-stock-target-ahead-of-innovation-day-december-7" target="_blank" rel="noopener" title="Bank of America resets Eli Lilly stock target ahead of key event">[TheStreet]</a></span></span></li>
+      <li><span class="tag neu">중립</span><span>릴리가 수면무호흡 분야에서 성과를 냈다는 보도와 FDA의 시력 손실 경고가 함께 언급됐습니다. 경고가 어떤 약에 대한 것인지는 제목만으로 분명하지 않습니다. <span class="src"><a href="https://finance.yahoo.com/healthcare/articles/etfs-spotlight-fda-vision-loss-163500090.html" target="_blank" rel="noopener" title="ETFs in Spotlight as FDA Vision Loss Warning Meets Lilly&#39;s Sleep Apnea Win">[Zacks]</a></span></span></li>
+      <li><span class="tag neg">악재</span><span>노보 노디스크의 위고비 알약이 3분기 54억 덴마크 크로네의 매출을 올렸고, 비만 치료제(GLP-1) 경쟁이 심해지고 있다는 분석이 나왔습니다. 수요일에는 릴리 주가가 장중 한때 약세였다는 보도도 있습니다. <span class="src"><a href="https://finance.yahoo.com/healthcare/articles/wegovy-pill-drive-renewed-glp-155600303.html" target="_blank" rel="noopener" title="Will Wegovy Pill Drive Renewed GLP-1 Growth Momentum for Novo Stock?">[Zacks]</a><a href="https://247wallst.com/investing/2026/11/11/hims-hers-climbs-6-despite-five-states-joining-ftc-suit-eli-lilly-dips-novo-nordisk-holds-steady/" target="_blank" rel="noopener" title="Hims &amp; Hers Climbs 6% Despite Five States Joining FTC Suit; Eli Lilly Dips, Novo Nordisk Holds Steady">[24/7 Wall St.]</a></span></span></li>
+      <li><span class="tag neu">중립</span><span>현재 주가가 앞으로의 현금흐름으로 뒷받침되는지, 기대가 너무 앞서간 것은 아닌지를 묻는 분석 기사가 나왔습니다. <span class="src"><a href="https://finance.yahoo.com/healthcare/articles/eli-lilly-lly-priced-below-011832255.html" target="_blank" rel="noopener" title="Is Eli Lilly (LLY) Priced Below Its Cash Flow Potential?">[Simply Wall St.]</a></span></span></li>
+    </ul>
+    <div class="three">
+      <div class="box p"><div class="label">긍정 요인</div><ul><li>매출이 4개 분기 연속 늘었습니다(2025-12 192.9억 달러 → 2026-09 244.0억 달러). 영업이익도 89.9억 달러에서 130.9억 달러로 함께 늘었습니다.</li><li>2026년 매출 전망을 최대 920억 달러로 올렸다는 보도가 있습니다.</li><li>비만 치료제 외 사업(수면무호흡 등)에 대한 기대도 언급되고 있습니다.</li></ul></div>
+      <div class="box n"><div class="label">부정 요인</div><ul><li>순이익은 2026-03 74.0억 달러에서 2026-06 71.0억 달러, 2026-09 64.5억 달러로 두 분기 연속 줄었습니다. 영업이익은 늘었는데 순이익이 준 이유는 데이터에 없습니다.</li><li>향후 이익 대비 주가(Forward PER)가 28.44배로 섹터 대형주 중 가장 높습니다. 애널리스트 평균 목표가까지 남은 상승 여지도 1.12%에 그칩니다.</li><li>노보 노디스크의 알약 제품 등 비만 치료제 경쟁이 심해지고 있습니다.</li></ul></div>
+      <div class="box w"><div class="label">체크 포인트</div><ul><li>순이익 감소가 일시적인 비용 때문인지 확인이 필요합니다.</li><li>BofA가 말한 &#39;중요 이벤트&#39;의 내용과 FDA 시력 손실 경고가 어떤 약에 대한 것인지 확인이 필요합니다.</li><li>다음 분기 매출 예상치는 247.6억 달러, EPS(주당순이익) 예상치는 11.23달러입니다. 배당락일은 2026-11-13입니다.</li></ul></div>
+    </div>
+    <div class="overall"><div class="label">종합 (중장기 관점)</div>매출과 영업이익이 빠르게 늘고 있고 연간 전망도 올렸다는 보도가 있어 성장 흐름은 뚜렷합니다. 다만 주가가 1개월 새 23.21% 올라 52주 최고가에 있고 이익 대비 주가도 높은 편이라, 이미 기대가 상당 부분 반영됐다는 시각이 있습니다. 순이익이 줄어든 이유와 비만 치료제 경쟁이 앞으로의 핵심 확인 사항입니다.</div>
+
+    <div class="fin">
+      <div class="label">최근 분기 실적 (야후 파이낸스 기준)</div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>분기</th><th>2025-12</th><th>2026-03</th><th>2026-06</th><th>2026-09</th></tr></thead>
+        <tbody>
+          <tr><td>매출</td><td>$19.3B</td><td>$19.8B</td><td>$23.0B</td><td>$24.4B</td></tr>
+          <tr><td>영업이익</td><td>$9.0B</td><td>$9.8B</td><td>$12.5B</td><td>$13.1B</td></tr>
+          <tr><td>순이익</td><td>$6.6B</td><td>$7.4B</td><td>$7.1B</td><td>$6.5B</td></tr>
+        </tbody>
+      </table></div>
+      <div class="muted small" style="margin-top:6px">
+        다음 실적 발표: 미정
+ · 다음 분기 매출 예상 $24.8B · 배당락일 2026-11-13      </div>
+    </div>
+  </div>
+  <div class="card deepcard" style="margin-top:14px">
+    <div class="head">
+      <h3>애보트 <span class="sym">ABT</span></h3>
+      <span class="price">$109.29</span>
+      <span class="down">-1.06%</span>
+      <span class="counts">뉴스 호재 3 · 악재 0 · 중립 1</span>
+    </div>
+    <div class="oneline">하루 -1.06%, 1주 -5.38%로 섹터에서 가장 약했고 52주 고점보다 16.31% 낮습니다. 하락 원인을 설명하는 뚜렷한 뉴스는 없습니다.</div>
+    <ul class="news">
+      <li><span class="tag pos">호재</span><span>심장 박동 관리용 신제품 UltiSynq 전극이 임상에서 좋은 결과를 냈다는 분석이 나왔습니다. 심장 기기 Amulet 360 관련 데이터도 공개된 것으로 알려졌습니다. <span class="src"><a href="https://finance.yahoo.com/healthcare/articles/ultisynq-lead-boost-abbotts-cardiac-154700062.html" target="_blank" rel="noopener" title="Can UltiSynq Lead Boost Abbott&#39;s Cardiac Rhythm Management Business?">[Zacks]</a><a href="https://news.google.com/rss/articles/CBMiwgFBVV95cUxOdlRKRlB6SlFWYl9CZUd6UnE0bWt5UzdrbHNlSWNnWktRTHRFOFVBUzRuYTB5REtQYVNkY2w1MmJIbFpvbnk3Wml3MjdJVGQ3OFVYUHdXQnpQektqeUlOSlNtdFpxaWI4eFZUeWU5VzVWUUdKS1VqSTQxRlFHOUZ5ZlJGX3Babk9nRDYwdUptdE1fS2h0VHBZMWdzVmZyVm5rWkVaaExqTm5hNG1FNkxFYWY2Y082SzE4NnVoNzdaVk1tQQ?oc=5" target="_blank" rel="noopener" title="Abbott Laboratories stock weighs Amulet 360 heart-device data">[ad-hoc-news.de]</a></span></span></li>
+      <li><span class="tag pos">호재</span><span>FDA 승인과 Oncodetect 출시 이후 애보트의 기업가치가 적정한지 따져보는 기사가 나왔습니다. <span class="src"><a href="https://news.google.com/rss/articles/CBMi2AFBVV95cUxOQUhDdkxyUklpZGpLQ1RMczlwYmw4NGREUGxJVVgzUjlOWmVfcWZ5ZHhKQmNJRTE0WWFNTk9aeWdoa2ZrcDhxc3lRMXZrSHhfbWt4VjNoOXQ0RVFhRjZVOTlaaFB5dW1PaFhYbnZRaG8xeGFiczBkVEJEenhSU3NBMU9TV2xRRHk1SFVEOVVnYlp0RG5xRDRJNGJxZENWZHFiWlVwYm5LbjVydHBYTWYzMkxBbDA5dmRFOGN1bjVvaEFLenczUm5HT3dSaG5PejQ3TWtPajlpbHPSAdgBQVVfeXFMTkFIQ3ZMclJJaWRqS0NUTHM5cGJsODRkRFBsSVVYM1I5TlplX3FmeWR4SkJjSUUxNFlhTU5PWnlnaGtma3A4cXN5UTF2a0h4X21reFYzaDl0NEVRYUY2VTk5WmhQeXVtT2hYWG52UWhvMXhhYnMwZFRCRHp4UlNzQTFPU1dsUUR5NUhVRDlVZ2JadERucUQ0STRicWRDVmRxYlpVcGJuS241cnRwWE1mMzJMQWwwOXZkRThjdW41b2hBS3p3M1JuR093UmhuT3o0N01rT2o5aWxz?oc=5" target="_blank" rel="noopener" title="Is Abbott Laboratories (ABT) Fairly Valued After Its FDA Win And Oncodetect Launch?">[Simply Wall St]</a></span></span></li>
+      <li><span class="tag neu">중립</span><span>애보트 주가가 지난 1년간 시장보다 부진했지만, 월가 애널리스트들은 여전히 긍정적이라는 보도입니다. Zacks 이용자들이 많이 찾아본 종목으로도 꼽혔습니다. <span class="src"><a href="https://www.barchart.com/story/news/8750613/what-are-wall-street-analysts-target-price-for-abbott-stock" target="_blank" rel="noopener" title="What Are Wall Street Analysts&#39; Target Price for Abbott Stock?">[Barchart]</a><a href="https://finance.yahoo.com/markets/stocks/articles/trending-stock-abbott-laboratories-abt-202143682.html" target="_blank" rel="noopener" title="Is Trending Stock Abbott Laboratories (ABT) a Buy Now?">[Zacks]</a></span></span></li>
+      <li><span class="tag pos">호재</span><span>코메르츠방크 펀드가 애보트 주식 603,275주를 새로 담았다고 알려졌습니다. <span class="src"><a href="https://news.google.com/rss/articles/CBMi5AFBVV95cUxNLVp3VzNHdU56bTdRdjdxMm1JQloyQ08zUUlLLWtLVGV3NTFSc21LRFdDblh6cFM4ck03TXpYUUJNcUcxMTRIOHJ6Mmx3MlpwaWRpdmxtUndiQzIxVUFoNkdxcExISEdFcXhYTk9yRXpyTXg1Ukp4UVRxVVREY0QzSTczQmFYMl9XemtlUHJ5REJuWFRyZ3VVbVhROFVwWEZKQWF4NnU5cFNlNG4yUDN6ZThxdEEzUDZOZkhQMjJadjdKWkU5Wm5KbVZyTG9FZkdNQW1YMG5JY19kWHlrcnRoYlhHbVM?oc=5" target="_blank" rel="noopener" title="Fund Update: 603,275 ABBOTT LABORATORIES (ABT) shares added to COMMERZBANK AKTIENGESELLSCHAFT |FI portfolio">[Quiver Quantitative]</a></span></span></li>
+    </ul>
+    <div class="three">
+      <div class="box p"><div class="label">긍정 요인</div><ul><li>2026-09 분기 매출이 130.1억 달러로, 데이터에 있는 분기 중 가장 많습니다.</li><li>심장 기기 신제품 임상 결과와 FDA 승인 등 제품 관련 소식이 이어지고 있습니다.</li><li>애널리스트 26명의 평균 의견은 &#39;매수&#39;이고, 평균 목표가까지 8.8% 여유가 있습니다.</li></ul></div>
+      <div class="box n"><div class="label">부정 요인</div><ul><li>매출은 늘었지만 영업이익은 2025-12 22.5억 달러에서 2026-09 13.6억 달러로, 순이익은 17.8억 달러에서 9.2억 달러로 줄었습니다.</li><li>3개월 -1.78%, 52주 고점 대비 -16.31%로, 1개월 새 10% 이상 오른 대형주들보다 뒤처져 있습니다.</li><li>2026-06 분기 실적 데이터가 비어 있어 추세를 정확히 보기 어렵습니다.</li></ul></div>
+      <div class="box w"><div class="label">체크 포인트</div><ul><li>다음 실적 발표일은 2027-01-28입니다. EPS 예상치는 1.64달러, 매출 예상치는 132.1억 달러입니다.</li><li>매출 증가에 비해 이익이 줄어든 이유는 데이터에 없어 실적 발표 때 확인이 필요합니다.</li><li>최근 1주 하락이 일시적인지, 추세적인 약세인지 지켜볼 필요가 있습니다.</li></ul></div>
+    </div>
+    <div class="overall"><div class="label">종합 (중장기 관점)</div>매출 규모는 커졌지만 영업이익과 순이익이 뚜렷하게 줄어 수익성 회복이 중장기 핵심 과제입니다. 심장 기기와 진단 분야 신제품 소식은 긍정적이지만, 아직 실적 개선으로 이어졌는지는 확인되지 않았습니다. 다음 실적 발표에서 이익률이 어떻게 나오는지가 중요한 확인 포인트입니다.</div>
+
+    <div class="fin">
+      <div class="label">최근 분기 실적 (야후 파이낸스 기준)</div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>분기</th><th>2025-12</th><th>2026-03</th><th>2026-06</th><th>2026-09</th></tr></thead>
+        <tbody>
+          <tr><td>매출</td><td>$11.5B</td><td>$11.2B</td><td>-</td><td>$13.0B</td></tr>
+          <tr><td>영업이익</td><td>$2.3B</td><td>$1.3B</td><td>-</td><td>$1.4B</td></tr>
+          <tr><td>순이익</td><td>$1.8B</td><td>$1.1B</td><td>-</td><td>$920M</td></tr>
+        </tbody>
+      </table></div>
+      <div class="muted small" style="margin-top:6px">
+        다음 실적 발표: 2027-01-28
+ · 다음 분기 매출 예상 $13.2B      </div>
+    </div>
+  </div>
+  <div class="card deepcard" style="margin-top:14px">
+    <div class="head">
+      <h3>길리어드 <span class="sym">GILD</span></h3>
+      <span class="price">$169.73</span>
+      <span class="down">-0.67%</span>
+      <span class="counts">뉴스 호재 3 · 악재 1 · 중립 1</span>
+    </div>
+    <div class="oneline">사상 최고가를 찍은 뒤 하루 -0.67%, 1주 -2.72%로 쉬어가는 모습입니다. HIV 주사제 임상 성과와 연간 전망 상향이 최근 주가 상승의 배경으로 꼽힙니다.</div>
+    <ul class="news">
+      <li><span class="tag pos">호재</span><span>1년에 두 번 맞는 HIV 예방 주사제 레나카파비르가 PURPOSE 5 임상에서 매일 먹는 예방약보다 꾸준히 사용된 비율이 높았습니다. 주사제 그룹에서는 HIV 감염이 한 건도 없었다고 발표됐습니다. <span class="src"><a href="https://finance.yahoo.com/healthcare/articles/gilead-sciences-gild-posts-purpose-141221031.html" target="_blank" rel="noopener" title="Gilead Sciences (GILD) Posts PURPOSE 5 Win As HIV Shot Beats Daily Pills">[Simply Wall St.]</a><a href="https://finance.yahoo.com/healthcare/articles/gilead-sciences-gild-trial-wins-131105977.html" target="_blank" rel="noopener" title="Gilead Sciences (GILD) After Trial Wins And Raised Guidance Looks Fully Valued">[Simply Wall St.]</a></span></span></li>
+      <li><span class="tag pos">호재</span><span>10월 29일 3분기 실적 발표 때 2026년 매출 전망을 올렸고, 이후 주가가 사상 최고가를 기록했다는 보도입니다. <span class="src"><a href="https://www.tikr.com/blog/merck-vs-gilead-sciences-which-dividend-stock-pays-you-more-in-10-years?ref=yahoofinancedividend&amp;tlnk=yf-261110-q8xjfwx2" target="_blank" rel="noopener" title="Merck vs. Gilead Sciences: Which Dividend Stock Pays You More in 10 Years?">[TIKR]</a><a href="https://finance.yahoo.com/healthcare/articles/gilead-sciences-gild-trial-wins-131105977.html" target="_blank" rel="noopener" title="Gilead Sciences (GILD) After Trial Wins And Raised Guidance Looks Fully Valued">[Simply Wall St.]</a><a href="https://www.fool.com/investing/2026/11/10/gilead-sciences-stock-hits-a-new-all-time-high-is-it-still-a-good-buy/" target="_blank" rel="noopener" title="Gilead Sciences Stock Hits a New All-Time High: Is it Still a Good Buy?">[Motley Fool]</a></span></span></li>
+      <li><span class="tag pos">호재</span><span>다발성골수종 세포치료제 anito-cel의 출시 가능성에 대비해 치료센터 200곳을 목표로 준비하고 있다고 회사 임원이 밝혔습니다. <span class="src"><a href="https://www.marketbeat.com/instant-alerts/event-gilead-sciences-targets-200-treatment-centers-for-potential-anito-cel-launch-2026-11-10/?utm_source=yahoofinance&amp;utm_medium=yahoofinance" target="_blank" rel="noopener" title="Gilead Sciences Targets 200 Treatment Centers for Potential Anito-Cel Launch">[MarketBeat]</a></span></span></li>
+      <li><span class="tag neu">중립</span><span>주가가 여전히 싸다는 분석과 이미 적정 가격에 도달했다는 분석이 같은 날 함께 나왔습니다. <span class="src"><a href="https://finance.yahoo.com/markets/stocks/articles/gilead-gild-stock-still-looks-151017046.html" target="_blank" rel="noopener" title="Gilead (GILD) Stock Still Looks Undervalued On Its 205% Run">[Simply Wall St.]</a><a href="https://finance.yahoo.com/healthcare/articles/gilead-sciences-gild-trial-wins-131105977.html" target="_blank" rel="noopener" title="Gilead Sciences (GILD) After Trial Wins And Raised Guidance Looks Fully Valued">[Simply Wall St.]</a></span></span></li>
+      <li><span class="tag neg">악재</span><span>경쟁사 Vir가 D형 간염 치료 후보에서 &#39;확실한 성공&#39;이라는 임상 결과를 내 주가가 약 2년 만의 최고치로 올랐다는 보도가 있습니다. <span class="src"><a href="https://www.investors.com/news/technology/vir-stock-hepatitis-d-treatment-gilead-mirum/?src=A00220&amp;yptr=yahoo" target="_blank" rel="noopener" title="Vir, A Gilead Rival, Shoots To Two-Year High On Its &#39;Clean Win&#39; In Hepatitis D Treatment">[Investor&#39;s Business Daily]</a></span></span></li>
+    </ul>
+    <div class="three">
+      <div class="box p"><div class="label">긍정 요인</div><ul><li>2026-09 분기 매출 83.0억 달러, 영업이익 34.8억 달러로 데이터에 있는 4개 분기 중 가장 높습니다.</li><li>HIV 예방 주사제가 임상에서 좋은 결과를 냈습니다.</li><li>연간 매출 전망을 올렸고, 세포치료제 출시도 준비하고 있습니다.</li></ul></div>
+      <div class="box n"><div class="label">부정 요인</div><ul><li>2026-06 분기에 104.96억 달러의 대규모 순손실이 있었습니다. 원인은 데이터에 없습니다.</li><li>간 질환 분야에서 Vir 등 경쟁사의 추격 가능성이 있습니다.</li><li>1개월 +14.74%, 3개월 +22.87%로 이미 많이 올랐고, 애널리스트 평균 목표가까지 남은 여지는 2.97%입니다.</li></ul></div>
+      <div class="box w"><div class="label">체크 포인트</div><ul><li>2026-06 순손실이 한 번만 발생한 비용인지 확인이 필요합니다.</li><li>HIV 예방 주사제의 처방 확대 속도와 anito-cel 승인·출시 일정을 지켜볼 필요가 있습니다.</li><li>다음 분기 매출 예상치는 83.3억 달러, EPS 예상치는 1.09달러입니다. 배당락일은 2026-12-15입니다.</li></ul></div>
+    </div>
+    <div class="overall"><div class="label">종합 (중장기 관점)</div>HIV 사업의 신제품 성과와 연간 전망 상향으로 성장 기대가 커졌고, 최근 분기 매출과 영업이익도 4개 분기 중 가장 좋았습니다. 다만 2026-06 대규모 손실의 성격과 간 질환 분야 경쟁은 확인이 필요하고, 주가가 많이 오른 만큼 가격 부담에 대한 의견도 엇갈립니다.</div>
+
+    <div class="fin">
+      <div class="label">최근 분기 실적 (야후 파이낸스 기준)</div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>분기</th><th>2025-12</th><th>2026-03</th><th>2026-06</th><th>2026-09</th></tr></thead>
+        <tbody>
+          <tr><td>매출</td><td>$7.9B</td><td>$7.0B</td><td>$7.8B</td><td>$8.3B</td></tr>
+          <tr><td>영업이익</td><td>$3.0B</td><td>$2.7B</td><td>$2.5B</td><td>$3.5B</td></tr>
+          <tr><td>순이익</td><td>$2.2B</td><td>$2.0B</td><td>-$10.5B</td><td>$2.4B</td></tr>
+        </tbody>
+      </table></div>
+      <div class="muted small" style="margin-top:6px">
+        다음 실적 발표: 미정
+ · 다음 분기 매출 예상 $8.3B · 배당락일 2026-12-15      </div>
+    </div>
+  </div>
+
+  <details>
+    <summary>섹터 종목별 최근 뉴스 제목 보기</summary>
+    <ul class="hl">
+      <li><b>일라이 릴리</b><a href="https://finance.yahoo.com/healthcare/articles/eli-lilly-lly-priced-below-011832255.html" target="_blank" rel="noopener">Is Eli Lilly (LLY) Priced Below Its Cash Flow Potential?</a>
+        <span class="muted small">Simply Wall St. 11/12 10:18</span></li>
+      <li><b></b><a href="https://www.fool.com/investing/2026/11/11/eli-lilly-just-raised-its-2026-sales-forecast-to-a/" target="_blank" rel="noopener">Eli Lilly Just Raised Its 2026 Sales Forecast to as Much as $92 Billion. But Is Viking Therapeutics the Next Big Obesity Winner?</a>
+        <span class="muted small">Motley Fool 11/12 07:54</span></li>
+      <li><b></b><a href="https://finance.yahoo.com/markets/stocks/articles/apple-shares-aapl-look-expensive-211500629.html" target="_blank" rel="noopener">Apple Shares (AAPL) Look Expensive Heading into 2027</a>
+        <span class="muted small">TipRanks 11/12 06:15</span></li>
+      <li><b></b><a href="https://www.fool.com/coverage/better-buy/2026/11/11/johnson-and-johnson-vs-eli-lilly-which-healthcare-giant-s-stock-is-a-better-buy-for-2027/" target="_blank" rel="noopener">Johnson &amp; Johnson vs. Eli Lilly: Which Healthcare Giant&#39;s Stock Is a Better Buy for 2027?</a>
+        <span class="muted small">Motley Fool 11/12 05:20</span></li>
+      <li><b></b><a href="https://finance.yahoo.com/healthcare/articles/sector-healthcare-stocks-softer-afternoon-182929576.html" target="_blank" rel="noopener">Sector Update: Healthcare Stocks Softer in Afternoon Trading</a>
+        <span class="muted small">MT Newswires 11/12 03:29</span></li>
+      <li><b>존슨앤드존슨</b><a href="https://www.fool.com/investing/2026/11/11/these-5-dividend-aristocrats-have-raised-payouts-f/" target="_blank" rel="noopener">These 5 Dividend Aristocrats® Have Raised Payouts for Decades</a>
+        <span class="muted small">Motley Fool 11/12 10:35</span></li>
+      <li><b></b><a href="https://www.fool.com/coverage/better-buy/2026/11/11/johnson-and-johnson-vs-eli-lilly-which-healthcare-giant-s-stock-is-a-better-buy-for-2027/" target="_blank" rel="noopener">Johnson &amp; Johnson vs. Eli Lilly: Which Healthcare Giant&#39;s Stock Is a Better Buy for 2027?</a>
+        <span class="muted small">Motley Fool 11/12 05:20</span></li>
+      <li><b></b><a href="https://www.fool.com/investing/2026/11/11/johnson-johnson-sees-a-path-to-double-digit-growth/" target="_blank" rel="noopener">Johnson &amp; Johnson Sees a Path to Double-Digit Growth by 2030. Is the Dividend King a Buy?</a>
+        <span class="muted small">Motley Fool 11/12 05:17</span></li>
+      <li><b></b><a href="https://www.medicaldevice-network.com/news/jj-funds-francis-medical-to-seek-cancer-indication-for-vanquish-device/" target="_blank" rel="noopener">J&amp;J funds Francis Medical to seek cancer indication for Vanquish device</a>
+        <span class="muted small">Medical Device Network 11/12 03:06</span></li>
+      <li><b></b><a href="https://finance.yahoo.com/healthcare/articles/johnson-johnson-reports-favorable-data-173242727.html" target="_blank" rel="noopener">Johnson &amp; Johnson Reports Favorable Data For Bipolar Study</a>
+        <span class="muted small">Benzinga 11/12 02:32</span></li>
+      <li><b>애브비</b><a href="https://247wallst.com/investing/etf/2026/11/11/want-a-dividend-check-every-month-this-dividend-etf-paid-you-12-times-in-the-past-year/" target="_blank" rel="noopener">Want a Dividend Check Every Month? This Dividend ETF Paid You 12 Times in the Past Year</a>
+        <span class="muted small">24/7 Wall St. 11/12 06:03</span></li>
+      <li><b></b><a href="https://www.trefis.com/stock/halo/articles/624246/can-you-make-money-off-halozyme-stock-now/2026-11-11" target="_blank" rel="noopener">Can You Make Money Off Halozyme Stock Now?</a>
+        <span class="muted small">Trefis 11/12 05:55</span></li>
+      <li><b></b><a href="https://www.fool.com/coverage/better-buy/2026/11/11/johnson-and-johnson-vs-eli-lilly-which-healthcare-giant-s-stock-is-a-better-buy-for-2027/" target="_blank" rel="noopener">Johnson &amp; Johnson vs. Eli Lilly: Which Healthcare Giant&#39;s Stock Is a Better Buy for 2027?</a>
+        <span class="muted small">Motley Fool 11/12 05:20</span></li>
+      <li><b></b><a href="https://finance.yahoo.com/markets/stocks/articles/top-analyst-reports-nvidia-walmart-200800641.html" target="_blank" rel="noopener">Top Analyst Reports for NVIDIA, Walmart &amp; AbbVie</a>
+        <span class="muted small">Zacks 11/12 05:08</span></li>
+      <li><b></b><a href="https://finance.yahoo.com/markets/stocks/articles/abbv-stock-rises-more-4-153900677.html" target="_blank" rel="noopener">ABBV Stock Rises More Than 4% in a Month: Time to Buy, Hold or Sell?</a>
+        <span class="muted small">Zacks 11/12 00:39</span></li>
+      <li><b>머크</b><a href="https://247wallst.com/investing/etf/2026/11/11/want-a-dividend-check-every-month-this-dividend-etf-paid-you-12-times-in-the-past-year/" target="_blank" rel="noopener">Want a Dividend Check Every Month? This Dividend ETF Paid You 12 Times in the Past Year</a>
+        <span class="muted small">24/7 Wall St. 11/12 06:03</span></li>
+      <li><b></b><a href="https://www.trefis.com/stock/halo/articles/624246/can-you-make-money-off-halozyme-stock-now/2026-11-11" target="_blank" rel="noopener">Can You Make Money Off Halozyme Stock Now?</a>
+        <span class="muted small">Trefis 11/12 05:55</span></li>
+      <li><b></b><a href="https://247wallst.com/investing/2026/11/11/americans-fill-prescriptions-every-month-and-90000-across-these-3-drugmakers-pays-3650-a-year/" target="_blank" rel="noopener">Americans Fill Prescriptions Every Month, and $90,000 Across These 3 Drugmakers Pays $3,650 a Year</a>
+        <span class="muted small">24/7 Wall St. 11/12 04:51</span></li>
+      <li><b></b><a href="https://www.barrons.com/articles/syzygy-investing-rob-arnott-tech-3e1fdf39?siteid=yhoof2&amp;yptr=yahoo" target="_blank" rel="noopener">Why This Legendary Investor Says to Look Beyond Tech—and the U. S.—for Values</a>
+        <span class="muted small">Barrons.com 11/12 04:10</span></li>
+      <li><b></b><a href="https://finance.yahoo.com/healthcare/articles/42-since-january-why-merck-091635980.html" target="_blank" rel="noopener">Up 42% since January: Why Merck is defeating the patent cliff</a>
+        <span class="muted small">Investing.com 11/11 18:16</span></li>
+      <li><b>유나이티드헬스</b><a href="https://www.wsj.com/lifestyle/workplace/desk-plants-office-employee-morale-10a0868a?siteid=yhoof2&amp;yptr=yahoo" target="_blank" rel="noopener">Bosses Have a New Plan to Boost Morale at the Office: Desk Plants</a>
+        <span class="muted small">The Wall Street Journal 11/12 05:23</span></li>
+      <li><b></b><a href="https://finance.yahoo.com/healthcare/articles/hums-oncology-model-strengthen-value-171300381.html" target="_blank" rel="noopener">Can HUM&#39;s New Oncology Model Strengthen Its Value-Based Care Strategy?</a>
+        <span class="muted small">Zacks 11/12 02:13</span></li>
+      <li><b></b><a href="https://finance.yahoo.com/markets/stocks/articles/cvs-stock-worth-buying-aetna-155900918.html" target="_blank" rel="noopener">Is CVS Stock Worth Buying as Aetna Recovers but PBM Risks Persist?</a>
+        <span class="muted small">Zacks 11/12 00:59</span></li>
+      <li><b></b><a href="https://www.barrons.com/livecoverage/stock-market-news-today-111126/card/the-dow-is-missing-out-on-the-coreweave-earnings-ai-rebound-LXm3I0zs27AV6x0WV71b?siteid=yhoof2&amp;yptr=yahoo" target="_blank" rel="noopener">The Dow Is Missing Out on the CoreWeave Earnings AI Rebound</a>
+        <span class="muted small">Barrons.com 11/12 00:53</span></li>
+      <li><b></b><a href="https://www.healthcaredive.com/news/unitedhealth-board-adds-childrens-hospital-ceo-madeline-bell/874367/" target="_blank" rel="noopener">UnitedHealth adds children’s hospital executive to board</a>
+        <span class="muted small">Healthcare Dive 11/11 23:24</span></li>
+      <li><b>써모피셔</b><a href="https://www.trefis.com/stock/gh/articles/624232/could-you-have-seen-the-run-in-guardant-health-stock-coming/2026-11-11" target="_blank" rel="noopener">Could You Have Seen The Run In Guardant Health Stock Coming?</a>
+        <span class="muted small">Trefis 11/12 06:34</span></li>
+      <li><b></b><a href="https://www.trefis.com/stock/ilmn/articles/624380/is-illumina-stock-worth-the-wait/2026-11-11" target="_blank" rel="noopener">Is Illumina Stock Worth The Wait?</a>
+        <span class="muted small">Trefis 11/12 00:29</span></li>
+      <li><b></b><a href="https://finance.yahoo.com/healthcare/articles/thermo-fisher-scientific-tmo-key-021658899.html" target="_blank" rel="noopener">Thermo Fisher Scientific (TMO) Is A Key Supplier In Cell Sheet Gene Therapy</a>
+        <span class="muted small">Simply Wall St. 11/11 11:16</span></li>
+      <li><b></b><a href="https://www.trefis.com/stock/ir/articles/623938/ingersoll-rand-vs-hubbell-which-stock-is-the-better-buy/2026-11-10" target="_blank" rel="noopener">Ingersoll Rand Vs Hubbell: Which Stock Is The Better Buy?</a>
+        <span class="muted small">Trefis 11/11 10:40</span></li>
+      <li><b></b><a href="https://finance.yahoo.com/technology/ai/articles/thermo-fisher-scientific-tmo-benefiting-160014480.html" target="_blank" rel="noopener">Thermo Fisher Scientific (TMO) Is Benefiting From More Than Healthcare Demand: Here’s the Overlooked AI Connection</a>
+        <span class="muted small">Insider Monkey 11/11 01:00</span></li>
+      <li><b>암젠</b><a href="https://www.investors.com/news/technology/amgen-stock-sjogrens-disease-treatment/?src=A00220&amp;yptr=yahoo" target="_blank" rel="noopener">Amgen, In A Buy Zone, Unveils Highly Anticipated Novartis-Rivaling Sjogren&#39;s Data</a>
+        <span class="muted small">Investor&#39;s Business Daily 11/12 06:02</span></li>
+      <li><b></b><a href="https://finance.yahoo.com/markets/stocks/articles/amgen-amgn-stock-looks-cheap-161004866.html" target="_blank" rel="noopener">Amgen (AMGN) Stock Looks Cheap Based On Future Cash Flow</a>
+        <span class="muted small">Simply Wall St. 11/12 01:10</span></li>
+      <li><b></b><a href="https://investorshub.advfn.com/market-news/article/39801/amgen-reports-phase-3-dazodalibep-trial-meets-primary-endpoint-in-sjogrens-disease" target="_blank" rel="noopener">Amgen Reports Phase 3 Dazodalibep Trial Meets Primary Endpoint in Sjögren’s Disease</a>
+        <span class="muted small">InvestorsHub 11/12 00:24</span></li>
+      <li><b></b><a href="https://247wallst.com/investing/2026/11/11/want-7000-in-passive-income-buy-these-3-dividend-stocks-today/" target="_blank" rel="noopener">Want $7,000 in Passive Income? Buy These 3 Dividend Stocks Today</a>
+        <span class="muted small">24/7 Wall St. 11/11 23:02</span></li>
+      <li><b></b><a href="https://finance.yahoo.com/healthcare/articles/ishares-biotechnology-etf-ibb-adds-110418132.html" target="_blank" rel="noopener">iShares Biotechnology ETF (IBB) Adds Gilead and Amgen on Nov. 9</a>
+        <span class="muted small">GuruFocus.com 11/11 20:04</span></li>
+      <li><b>길리어드</b><a href="https://finance.yahoo.com/markets/stocks/articles/abbv-stock-rises-more-4-153900677.html" target="_blank" rel="noopener">ABBV Stock Rises More Than 4% in a Month: Time to Buy, Hold or Sell?</a>
+        <span class="muted small">Zacks 11/12 00:39</span></li>
+      <li><b></b><a href="https://finance.yahoo.com/markets/stocks/articles/gilead-gild-stock-still-looks-151017046.html" target="_blank" rel="noopener">Gilead (GILD) Stock Still Looks Undervalued On Its 205% Run</a>
+        <span class="muted small">Simply Wall St. 11/12 00:10</span></li>
+      <li><b></b><a href="https://finance.yahoo.com/healthcare/articles/gilead-sciences-gild-posts-purpose-141221031.html" target="_blank" rel="noopener">Gilead Sciences (GILD) Posts PURPOSE 5 Win As HIV Shot Beats Daily Pills</a>
+        <span class="muted small">Simply Wall St. 11/11 23:12</span></li>
+      <li><b></b><a href="https://finance.yahoo.com/healthcare/articles/gilead-sciences-gild-trial-wins-131105977.html" target="_blank" rel="noopener">Gilead Sciences (GILD) After Trial Wins And Raised Guidance Looks Fully Valued</a>
+        <span class="muted small">Simply Wall St. 11/11 22:11</span></li>
+      <li><b></b><a href="https://finance.yahoo.com/healthcare/articles/ishares-biotechnology-etf-ibb-adds-110418132.html" target="_blank" rel="noopener">iShares Biotechnology ETF (IBB) Adds Gilead and Amgen on Nov. 9</a>
+        <span class="muted small">GuruFocus.com 11/11 20:04</span></li>
+      <li><b>애보트</b><a href="https://www.trefis.com/stock/dxcm/articles/624387/is-dexcom-stock-cheaper-now-that-its-multiple-has-fallen/2026-11-11" target="_blank" rel="noopener">Is DexCom Stock Cheaper Now That Its Multiple Has Fallen?</a>
+        <span class="muted small">Trefis 11/12 06:17</span></li>
+      <li><b></b><a href="https://finance.yahoo.com/markets/stocks/articles/trending-stock-abbott-laboratories-abt-202143682.html" target="_blank" rel="noopener">Is Trending Stock Abbott Laboratories (ABT) a Buy Now?</a>
+        <span class="muted small">Zacks 11/12 05:21</span></li>
+      <li><b></b><a href="https://finance.yahoo.com/healthcare/articles/ultisynq-lead-boost-abbotts-cardiac-154700062.html" target="_blank" rel="noopener">Can UltiSynq Lead Boost Abbott&#39;s Cardiac Rhythm Management Business?</a>
+        <span class="muted small">Zacks 11/12 00:47</span></li>
+      <li><b></b><a href="https://247wallst.com/investing/2026/11/11/3-legacy-health-care-dividend-stocks-that-never-go-out-of-style/" target="_blank" rel="noopener">3 Legacy Health Care Dividend Stocks That Never Go Out of Style</a>
+        <span class="muted small">24/7 Wall St. 11/12 00:17</span></li>
+      <li><b></b><a href="https://www.barchart.com/story/news/8750613/what-are-wall-street-analysts-target-price-for-abbott-stock" target="_blank" rel="noopener">What Are Wall Street Analysts&#39; Target Price for Abbott Stock?</a>
+        <span class="muted small">Barchart 11/10 17:59</span></li>
+      <li><b>화이자</b><a href="https://www.wsj.com/health/pharma/pfizer-signs-1-5-billion-deal-with-blackstone-to-fund-weight-loss-drug-development-b6b08b5d?siteid=yhoof2&amp;yptr=yahoo" target="_blank" rel="noopener">Pfizer Signs $1.5 Billion Deal With Blackstone to Fund Weight-Loss-Drug Development</a>
+        <span class="muted small">The Wall Street Journal 11/12 07:00</span></li>
+      <li><b></b><a href="https://www.trefis.com/stock/halo/articles/624246/can-you-make-money-off-halozyme-stock-now/2026-11-11" target="_blank" rel="noopener">Can You Make Money Off Halozyme Stock Now?</a>
+        <span class="muted small">Trefis 11/12 05:55</span></li>
+      <li><b></b><a href="https://247wallst.com/investing/2026/11/11/americans-fill-prescriptions-every-month-and-90000-across-these-3-drugmakers-pays-3650-a-year/" target="_blank" rel="noopener">Americans Fill Prescriptions Every Month, and $90,000 Across These 3 Drugmakers Pays $3,650 a Year</a>
+        <span class="muted small">24/7 Wall St. 11/12 04:51</span></li>
+      <li><b></b><a href="https://www.tikr.com/blog/att-or-pfizer-only-one-gets-my-dividend-dollars-for-the-next-10-years?ref=yahoofinancedividend&amp;tlnk=yf-261111-qvcrhf46" target="_blank" rel="noopener">AT&amp;T or Pfizer: Only One Gets My Dividend Dollars for the Next 10 Years</a>
+        <span class="muted small">TIKR 11/12 04:50</span></li>
+      <li><b></b><a href="https://finance.yahoo.com/healthcare/articles/42-since-january-why-merck-091635980.html" target="_blank" rel="noopener">Up 42% since January: Why Merck is defeating the patent cliff</a>
+        <span class="muted small">Investing.com 11/11 18:16</span></li>
+    </ul>
+  </details>
+</section>
+
+<footer>
+  자료: 야후 파이낸스(시세·재무·애널리스트 집계), 구글 뉴스·야후 뉴스(뉴스). AI 요약: Claude.
+  재무 숫자는 출처의 업데이트 시점에 따라 최신 분기가 늦게 반영될 수 있습니다.
+</footer>
+</div>
+</body>
+</html>
